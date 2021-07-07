@@ -1,2 +1,2 @@
-# Die offizielle und private Campuswoche 2021
-Im Ordner "construction" sind die 3D-Druckdateien zu finden und bald auch die Lasercut-Dateien. 
+# This is the official (and private) Campusweek of Corona-2021 in Gelsenkirchen
+Have some fun and drink beer :beers:

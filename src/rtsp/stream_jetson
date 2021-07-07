@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ ./gst-rtsp-server/examples/test-launch "nvarguscamerasrc ! video/xraw(memory:NVMM) width=1920 height=1080 framerate=30/1 format=NV12 !
+omxh264enc iframeinterval=15! h264parse ! rtph264pay name=pay0 pt=96"
