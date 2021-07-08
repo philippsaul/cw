@@ -1,7 +1,12 @@
 $fn=400;
 kerf = 0.4;
 thickness = 4;
+thickness_front = 4;
+height_front = 50;
 fillet = 3;
+front_slot_width = 0.6;
+front_stand_width = 2.5;
+front_pin_width = 2;
 
 module main_plate(){
     linear_extrude(thickness){
@@ -15,16 +20,22 @@ module main_plate(){
     }
 }
 
-module front(width=80, height=40){
+module front(width=150, height=height_front){
    linear_extrude(thickness){
         difference(){
-            square([width,height]);
-            for(i=[0:20]){
-                translate([4*i, 2, 0]) square([1, height]);
+            square([width,height-2*thickness]);
+            for(i=[0:200]){
+                translate([2*i*front_stand_width, front_stand_width, 0]) square([front_slot_width, height-2*thickness]);
             }
-            translate([2,-2,0]) for(i=[0:20]){
-                translate([4*i, 0, 0]) square([1, height]);
+            translate([front_stand_width,-2,0]) for(i=[0:200]){
+                translate([2*i*front_stand_width, 0, 0]) square([front_slot_width, height-2*thickness]);
             }
+        }
+        for(i=[0:28]){
+            translate([i*2*(front_stand_width)-front_slot_width+front_stand_width*2,-thickness,0]) square([front_pin_width, thickness]);
+        }
+        for(i=[0:29]){
+            translate([i*2*(front_stand_width)+front_stand_width-front_slot_width,height-2*thickness,0]) square([front_pin_width, thickness]);
         }
    }
 }
@@ -32,13 +43,10 @@ module front(width=80, height=40){
 module lasercut(){
     offset(delta=kerf/2) {
         projection() {
-//            site();
-//            translate([b_height+lc_slot,0,0]) site();
-//            translate([b_height*2+lc_slot*2,0,0]) back();
-//            translate([b_height*2+lc_slot*2,b_height+lc_slot,0]) back();
-//            translate([b_length,b_length+lc_slot,0]) rotate([0,0,90]) bottom();
+            front();
         }
     }
 }
-//main_plate();
-front();
+//lasercut();
+main_plate();
+//front();
