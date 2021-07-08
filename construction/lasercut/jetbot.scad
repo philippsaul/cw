@@ -7,16 +7,37 @@ fillet = 3;
 front_slot_width = 0.6;
 front_stand_width = 2.5;
 front_pin_width = 2;
+bore_d = 3.3;
 
 module main_plate(){
     linear_extrude(thickness){
-        offset(-fillet) offset(fillet) offset(fillet) offset(-fillet) {
-            square([100,80]);
+        //offset(-fillet) offset(fillet) offset(fillet) offset(-fillet) {
             difference(){
-                translate([50,0,0]) resize([140,60]) circle(d=140);
-                translate([-20,0,0]) square([140,50]);
+                square([100,80]);
+                translate([8.625+1.375,2.625+1.375,0]) circle(d=bore_d);
+                translate([94.625+1.375,2.625+1.375,0]) circle(d=bore_d);
+                translate([94.625+1.375,60.625+1.375,0]) circle(d=bore_d);
+                translate([8.625+1.375,60.625+1.375,0]) circle(d=bore_d);
+
+                // h bruecke
+                translate([3,3,0]) circle(d=bore_d);
+                translate([3,40,0]) circle(d=bore_d);
+                translate([40,40,0]) circle(d=bore_d);
+                translate([40,3,0]) circle(d=bore_d);
+
+                // spannungswandler
+                // kein größerer Kopf als 4.5 im Durchmesser
+                translate([5.025+1.475,17.275+1.475,0]) circle(d=bore_d);
+                translate([35.225+1.475,1.025+1.475,0]) circle(d=bore_d);
+
+
+
             }
-        }
+            difference(){
+                translate([50,50,0]) circle(d=180);
+                translate([-40,0,0]) square([240,200]);
+            }
+        //}
     }
 }
 
