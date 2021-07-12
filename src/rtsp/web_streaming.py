@@ -77,30 +77,35 @@ def menu(frame):
     
 
     shape_multiplier = 1.5
-
+    frame = cv2.imread(menu_images[active_menu_item])
     for i in range(len(menu_content)):
         if active_menu_item == i:      
-            frame = cv2.imread(menu_images[i])
+            
             # print(menu_content)
 
             if menu_content[i] == "back":
                 cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
             else:             
-                cv2.putText(frame,menu_content[i],(10,(i+1)*100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+                
                 # shape around menu item
                 pts = np.array([[40,(i+1)*100-20],[20,(i+1)*100],[40, (i+1)*100+20],[shape_multiplier*200, (i+1)*100+20],[shape_multiplier*200+20, (i+1)*100],[shape_multiplier*200, (i+1)*100-20]], np.int32)
                 pts = pts.reshape((-1,1,2))
                 cv2.fillPoly(frame, [pts], (100,100,100))
 
+                cv2.putText(frame,menu_content[i],(50,(i+1)*100+12), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+
         else:
             if menu_content[i] == "back":
+                
                 cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
             else:
-                cv2.putText(frame,menu_content[i],(10,(i+1)*100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
+                
                 # shape around menu item
                 pts = np.array([[40,(i+1)*100-20],[20,(i+1)*100],[40, (i+1)*100+20],[shape_multiplier*200, (i+1)*100+20],[shape_multiplier*200+20, (i+1)*100],[shape_multiplier*200, (i+1)*100-20]], np.int32)
                 pts = pts.reshape((-1,1,2))
                 cv2.fillPoly(frame, [pts], (100,100,100))
+
+                cv2.putText(frame,menu_content[i],(50,(i+1)*100+12), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
     return frame
 
         
