@@ -81,7 +81,7 @@ def menu(frame):
     for i in range(len(menu_content)):
         if active_menu_item == i:      
             frame = cv2.imread(menu_images[i])
-            print(menu_content)
+            # print(menu_content)
 
             if menu_content[i] == "back":
                 cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
