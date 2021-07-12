@@ -4,8 +4,14 @@ import threading
 from flask import Response, Flask
 import os
 import socket
+import numpy as np
 
 os.system("sudo systemctl restart nvargus-daemon")
+
+activate_menu = True
+menu_content = ["Ball Jagen", "Mario Kart", "Tore fahren", "Settings", "back"]
+menu_images = ["../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg"]
+active_menu_item = 2
 
 # Image frame sent to the Flask object
 global video_frame
@@ -37,11 +43,15 @@ def captureFrames():
         cv2.putText(frame,socket.gethostname(),(300,50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         # Platzierung
-        if socket.gethostname() == "nanolars":
-            cv2.putText(frame,"1.",(10,550), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2, cv2.LINE_AA)
-        else:
-            cv2.putText(frame,"4.",(10,550), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2, cv2.LINE_AA)
+        if not activate_menu:
+            if socket.gethostname() == "nanolars" or socket.gethostname() == "nanop":
+                cv2.putText(frame,"1.",(10,550), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2, cv2.LINE_AA)
+            else:
+                cv2.putText(frame,"4.",(10,550), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2, cv2.LINE_AA)
 
+        if activate_menu:
+            frame = menu(frame)
+            
 
         ################################################################
        
@@ -58,6 +68,41 @@ def captureFrames():
             break
 
     video_capture.release()
+
+
+def menu(frame):
+    
+    # frame = np.zeros((616, 960, 3), dtype = "uint8")
+
+    
+
+    shape_multiplier = 1.5
+
+    for i in range(len(menu_content)):
+        if active_menu_item == i:      
+            frame = cv2.imread(menu_images[i])
+            print(menu_content)
+
+            if menu_content[i] == "back":
+                cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+            else:             
+                cv2.putText(frame,menu_content[i],(10,(i+1)*100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+                # shape around menu item
+                pts = np.array([[40,(i+1)*100-20],[20,(i+1)*100],[40, (i+1)*100+20],[shape_multiplier*200, (i+1)*100+20],[shape_multiplier*200+20, (i+1)*100],[shape_multiplier*200, (i+1)*100-20]], np.int32)
+                pts = pts.reshape((-1,1,2))
+                cv2.fillPoly(frame, [pts], (100,100,100))
+
+        else:
+            if menu_content[i] == "back":
+                cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
+            else:
+                cv2.putText(frame,menu_content[i],(10,(i+1)*100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
+                # shape around menu item
+                pts = np.array([[40,(i+1)*100-20],[20,(i+1)*100],[40, (i+1)*100+20],[shape_multiplier*200, (i+1)*100+20],[shape_multiplier*200+20, (i+1)*100],[shape_multiplier*200, (i+1)*100-20]], np.int32)
+                pts = pts.reshape((-1,1,2))
+                cv2.fillPoly(frame, [pts], (100,100,100))
+    return frame
+
         
 def encodeFrame():
     global thread_lock
