@@ -3,6 +3,7 @@ import time
 import threading
 from flask import Response, Flask
 import os
+import socket
 
 os.system("sudo systemctl restart nvargus-daemon")
 
@@ -28,6 +29,22 @@ def captureFrames():
 
     while True and video_capture.isOpened():
         return_key, frame = video_capture.read()
+
+        ################################################################
+        # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+        # Hostname 
+        cv2.putText(frame,socket.gethostname(),(300,50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # Platzierung
+        if socket.gethostname() == "nanolars":
+            cv2.putText(frame,"1.",(10,550), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2, cv2.LINE_AA)
+        else:
+            cv2.putText(frame,"4.",(10,550), cv2.FONT_HERSHEY_SIMPLEX, 4, (255, 255, 255), 2, cv2.LINE_AA)
+
+
+        ################################################################
+       
         if not return_key:
             break
 
