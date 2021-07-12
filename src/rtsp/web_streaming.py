@@ -2,6 +2,9 @@ import cv2
 import time
 import threading
 from flask import Response, Flask
+import os
+
+os.system("sudo systemctl restart nvargus-daemon")
 
 # Image frame sent to the Flask object
 global video_frame
@@ -12,7 +15,7 @@ global thread_lock
 thread_lock = threading.Lock()
 
 # GStreamer Pipeline to access the Raspberry Pi camera
-GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=3280, height=2464, format=(string)NV12, framerate=21/1 ! nvvidconv flip-method=2 ! video/x-raw, width=960, height=616, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
+GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, height=720, format=(string)NV12, framerate=59/1 ! nvvidconv flip-method=2 ! video/x-raw, width=960, height=616, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink wait-on-eos=false max-buffers=1 drop=True'
 
 # Create the Flask object for the application
 app = Flask(__name__)
