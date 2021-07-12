@@ -1,5 +1,0 @@
-#!/bin/bash
-
-gst-launch-1.0 -v rtspsrc location=rtspt://<IP Address>:8554/test !
-application/x-rtp, payload=96 ! rtph264depay ! avdec_h264 ! videoconvert !
-autovideosink sync=false
