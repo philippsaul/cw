@@ -8,7 +8,7 @@ import numpy as np
 
 os.system("sudo systemctl restart nvargus-daemon")
 
-activate_menu = True
+activate_menu = False
 menu_content = ["Ball Jagen", "Mario Kart", "Tore fahren", "Settings", "back"]
 menu_images = ["../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg"]
 active_menu_item = 2
@@ -51,7 +51,19 @@ def captureFrames():
 
         if activate_menu:
             frame = menu(frame)
-            
+        
+
+        # FACE DETECTION
+        face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+        # Convert into grayscale
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Detect faces
+        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        # Draw rectangle around the faces
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+
 
         ################################################################
        
@@ -73,8 +85,6 @@ def captureFrames():
 def menu(frame):
     
     # frame = np.zeros((616, 960, 3), dtype = "uint8")
-
-    
 
     shape_multiplier = 1.5
     frame = cv2.imread(menu_images[active_menu_item])
