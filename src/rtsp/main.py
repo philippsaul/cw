@@ -66,8 +66,8 @@ try:
 
         valpwm1 = format(valpwm1, '.1f')  
         valpwm2 = format(valpwm2, '.1f')        
-        print(valpwm1)
-        print(valpwm2)
+        # print(valpwm1)
+        # print(valpwm2)
         #print("___________")
 
         valpwm1 = float(valpwm1)

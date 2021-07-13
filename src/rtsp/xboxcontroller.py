@@ -13,7 +13,7 @@ def ausgabe(argument):
         return joy.leftStick()
 
 while True:
-    print(joy.rightTrigger())
-    print(joy.leftTrigger())
+    joy.rightTrigger()
+    joy.leftTrigger()
 
 #joy.close()

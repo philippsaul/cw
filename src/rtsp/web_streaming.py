@@ -5,6 +5,8 @@ from flask import Response, Flask
 import os
 import socket
 import numpy as np
+import math
+import Jetson.GPIO as GPIO
 
 os.system("sudo systemctl restart nvargus-daemon")
 
@@ -26,6 +28,22 @@ GSTREAMER_PIPELINE = 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=1280, h
 
 # Create the Flask object for the application
 app = Flask(__name__)
+
+# GPIO SETUP
+pwm_pin_motor_rechts = 32
+pwm_pin_motor_links = 33
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+GPIO.setup(pwm_pin_motor_rechts, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(pwm_pin_motor_links, GPIO.OUT,initial=GPIO.LOW)
+pwm1 = GPIO.PWM(pwm_pin_motor_rechts, 100)
+pwm2 = GPIO.PWM(pwm_pin_motor_links, 100)
+valpwm1 = 0
+valpwm2 = 0
+pwm1.start(valpwm1)
+pwm2.start(valpwm2)
+
 
 def captureFrames():
     global video_frame, thread_lock
@@ -53,15 +71,96 @@ def captureFrames():
             frame = menu(frame)
         
 
-        # FACE DETECTION
-        face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        # Convert into grayscale
+        # # FACE DETECTION
+        # face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+        # # Convert into grayscale
+        # gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # # Detect faces
+        # faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+        # # Draw rectangle around the faces
+        # for (x, y, w, h) in faces:
+        #     cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+
+
+
+
+
+
+        # LINE DETECTION
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # Detect faces
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-        # Draw rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+        kernel_size = 5
+        blur_gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
+
+        low_threshold = 50
+        high_threshold = 150
+        edges = cv2.Canny(blur_gray, low_threshold, high_threshold)
+
+        rho = 1  # distance resolution in pixels of the Hough grid
+        theta = np.pi / 180  # angular resolution in radians of the Hough grid
+        threshold = 15  # minimum number of votes (intersections in Hough grid cell)
+        min_line_length = 50  # minimum number of pixels making up a line
+        max_line_gap = 20  # maximum gap in pixels between connectable line segments
+        line_image = np.copy(frame) * 0  # creating a blank to draw lines on
+
+        # Run Hough on edge detected image
+        # Output "lines" is an array containing endpoints of detected line segments
+        lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]),
+                                min_line_length, max_line_gap)
+
+        horizontal_threshold = 600
+        angles = []
+        for line in lines:
+            for x1, y1, x2, y2 in line:
+                if y1 > horizontal_threshold or y2 > horizontal_threshold:
+                    # print(math.degrees(math.asin((y1 - y2)/math.sqrt((y1-y2)**2+(x1-x2)**2))))
+                    angle = math.degrees(math.asin((y1 - y2)/math.sqrt((y1-y2)**2+(x1-x2)**2)))
+                    if angle > 0:
+                        angle = 90.0 - angle
+                    else:
+                        angle = -(90.0 + angle)
+                    angles.append(angle)
+                    cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 1)
+        
+        angle = np.average(angles)    
+        
+        speed_factor = 0
+        if angle < 5.0 and angle > -5.0:
+            angle_text = "gerade aus"
+            pwm1.ChangeDutyCycle(speed_factor*100.0)
+            pwm2.ChangeDutyCycle(speed_factor*100.0)
+        elif angle > 5.0 and angle < 20.0:
+            angle_text = "bisschen rechts"
+            pwm1.ChangeDutyCycle(speed_factor*80.0)
+            pwm2.ChangeDutyCycle(speed_factor*100.0)
+        elif angle > 20.0:
+            angle_text = "stark rechts"
+            pwm1.ChangeDutyCycle(speed_factor*60.0)
+            pwm2.ChangeDutyCycle(speed_factor*100.0)
+        elif angle < -5.0 and angle > -20.0:
+            angle_text = "bisschen links"
+            pwm1.ChangeDutyCycle(speed_factor*100.0)
+            pwm2.ChangeDutyCycle(speed_factor*80.0)
+        elif angle < -20.0:
+            angle_text = "stark links"
+            pwm1.ChangeDutyCycle(speed_factor*100.0)
+            pwm2.ChangeDutyCycle(speed_factor*60.0)
+        else: 
+            angle_text = "error"
+            pwm1.ChangeDutyCycle(0)
+            pwm2.ChangeDutyCycle(0)
+        cv2.putText(frame,angle_text,(50,100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.putText(frame,str(angle),(50,180), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+        frame = cv2.addWeighted(frame, 0.8, line_image, 10, 0)
+
+        # line with pwm gpio motor run
+        # pwm1.ChangeDutyCycle(100)
+        # pwm2.ChangeDutyCycle(100)
+
+
+
+
 
 
 
