@@ -1,5 +1,10 @@
 import Jetson.GPIO as GPIO
 import time
+import os
+import subprocess
+
+#subprocess.run('python3 web_streaming.py')
+
 
 pwm_pin_motor_rechts = 32
 pwm_pin_motor_links = 33
@@ -81,4 +86,4 @@ finally:
 #GPIO.setwarnings(False)
 
 #GPIO.setup(11, GPIO.OUT)
-#GPIO.output(11, GPIO.HIGH)
+#GPIO.output(11, GPIO.HIGH)q

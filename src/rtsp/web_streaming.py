@@ -71,7 +71,7 @@ def captureFrames():
 
 
 def menu(frame):
-    
+    return frame    
     # frame = np.zeros((616, 960, 3), dtype = "uint8")
 
     
