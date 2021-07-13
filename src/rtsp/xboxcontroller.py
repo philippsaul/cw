@@ -12,4 +12,8 @@ def ausgabe(argument):
     elif(argument == "ls"):
         return joy.leftStick()
 
+while True:
+    print(joy.rightTrigger())
+    print(joy.leftTrigger())
+
 #joy.close()
