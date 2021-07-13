@@ -8,7 +8,7 @@ import numpy as np
 
 os.system("sudo systemctl restart nvargus-daemon")
 
-activate_menu = False
+activate_menu = True
 menu_content = ["Ball Jagen", "Mario Kart", "Tore fahren", "Settings", "back"]
 menu_images = ["../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg","../../assets/background_menu.jpg"]
 active_menu_item = 2
@@ -51,19 +51,7 @@ def captureFrames():
 
         if activate_menu:
             frame = menu(frame)
-        
-
-        # FACE DETECTION
-        face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
-        # Convert into grayscale
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # Detect faces
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-        # Draw rectangle around the faces
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-
-
+            
 
         ################################################################
        
@@ -83,39 +71,36 @@ def captureFrames():
 
 
 def menu(frame):
-    return frame    
+    
     # frame = np.zeros((616, 960, 3), dtype = "uint8")
 
+    
+
     shape_multiplier = 1.5
-    frame = cv2.imread(menu_images[active_menu_item])
+
     for i in range(len(menu_content)):
         if active_menu_item == i:      
-            
-            # print(menu_content)
+            frame = cv2.imread(menu_images[i])
+            print(menu_content)
 
             if menu_content[i] == "back":
                 cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
             else:             
-                
+                cv2.putText(frame,menu_content[i],(10,(i+1)*100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
                 # shape around menu item
                 pts = np.array([[40,(i+1)*100-20],[20,(i+1)*100],[40, (i+1)*100+20],[shape_multiplier*200, (i+1)*100+20],[shape_multiplier*200+20, (i+1)*100],[shape_multiplier*200, (i+1)*100-20]], np.int32)
                 pts = pts.reshape((-1,1,2))
                 cv2.fillPoly(frame, [pts], (100,100,100))
-
-                cv2.putText(frame,menu_content[i],(50,(i+1)*100+12), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
 
         else:
             if menu_content[i] == "back":
-                
                 cv2.putText(frame,menu_content[i],(750,500), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
             else:
-                
+                cv2.putText(frame,menu_content[i],(10,(i+1)*100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
                 # shape around menu item
                 pts = np.array([[40,(i+1)*100-20],[20,(i+1)*100],[40, (i+1)*100+20],[shape_multiplier*200, (i+1)*100+20],[shape_multiplier*200+20, (i+1)*100],[shape_multiplier*200, (i+1)*100-20]], np.int32)
                 pts = pts.reshape((-1,1,2))
                 cv2.fillPoly(frame, [pts], (100,100,100))
-
-                cv2.putText(frame,menu_content[i],(50,(i+1)*100+12), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
     return frame
 
         
