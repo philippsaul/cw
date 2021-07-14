@@ -2,6 +2,8 @@ import Jetson.GPIO as GPIO
 import time
 import os
 import subprocess
+from ps4test import Controller
+import threading
 
 #subprocess.run('python3 web_streaming.py')
 
@@ -38,7 +40,9 @@ def truncate(f, n):
 if(controller == "xbox"):
     import xboxcontroller
 elif(controller == "ps4"):
-    import ps4controller
+    ps4 = Controller(interface="/dev/input/js0", connecting_using_ds4drv=False)
+    ps4_thread = threading.Thread(target=ps4.listen, name="test")
+    ps4_thread.start()
 else:
     print("Falsche Controller Variable: ps4/xbox")
 
@@ -61,21 +65,30 @@ pwm2.start(valpwm2)
 
 try:
     while(True):
-        ls = xboxcontroller.ausgabe("ls")
-        ls = truncate(ls , 3)
-        ls = ls.replace("(","")
-        ls = ls.replace(",","")
-        rt = xboxcontroller.ausgabe("rt")
-        rt = truncate(rt , 3)
-        rt = rt.replace("(","")
-        rt = rt.replace(",","")
-        rt = float(rt)
-        ls = float(ls)
-        lt = xboxcontroller.ausgabe("lt")
-        lt = truncate(lt , 3)
-        lt = lt.replace("(","")
-        lt = lt.replace(",","")
-        lt = float(lt)
+        if(controller == "xbox"):
+            ls = xboxcontroller.ausgabe("ls")
+            ls = truncate(ls , 3)
+            ls = ls.replace("(","")
+            ls = ls.replace(",","")
+            rt = xboxcontroller.ausgabe("rt")
+            rt = truncate(rt , 3)
+            rt = rt.replace("(","")
+            rt = rt.replace(",","")
+            rt = float(rt)
+            ls = float(ls)
+            lt = xboxcontroller.ausgabe("lt")
+            lt = truncate(lt , 3)
+            lt = lt.replace("(","")
+            lt = lt.replace(",","")
+            lt = float(lt)
+        elif(controller == "ps4"):
+            ls = (ps4.ls + 32767)/65534
+            rt = (ps4.rt + 32767)/65534
+            lt = (ps4.lt + 32767)/65534
+        else:
+            print("Falsche Controller Variable: ps4/xbox")
+
+        
 
         # #Buttonabfrage für Tempomat
         # yb = xboxcontroller.ausgabe("yb")
