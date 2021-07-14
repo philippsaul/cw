@@ -62,7 +62,7 @@ def captureFrames():
         # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
         # Hostname 
-        cv2.putText(frame,socket.gethostname(),(300,50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
+        # cv2.putText(frame,socket.gethostname(),(300,50), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 255, 255), 2, cv2.LINE_AA)
 
         # Platzierung
         # if not activate_menu:
@@ -115,60 +115,60 @@ def captureFrames():
 
         horizontal_threshold = 300 #600
         angles = []
-        destinations = []
-        destination_x = -1
-        for line in lines:
-            for x1, y1, x2, y2 in line:
-                if y1 > horizontal_threshold or y2 > horizontal_threshold:
-                    if y2 > y1:
-                        destination_x = x2
-                    else:
-                        destination_x = x1
-                    destinations.append(destination_x)
-                    cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-        if not len(lines):
-            destination_x = -1
-        if not destination_x == -1:
-            destination_x = np.average(destinations)
+        # destinations = []
+        # destination_x = -1
+        # for line in lines:
+        #     for x1, y1, x2, y2 in line:
+        #         if y1 > horizontal_threshold or y2 > horizontal_threshold:
+        #             if y2 > y1:
+        #                 destination_x = x2
+        #             else:
+        #                 destination_x = x1
+        #             destinations.append(destination_x)
+        #             cv2.line(line_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+        # if not len(lines):
+        #     destination_x = -1
+        # if not destination_x == -1:
+        #     destination_x = np.average(destinations)
         
-        angle = np.average(angles)    
+        # angle = np.average(angles)    
         
-        speed_factor = 0.35
-        if destination_x == -1:
-            angle_text = "stopp"
-            pwm1.ChangeDutyCycle(0.0)
-            pwm2.ChangeDutyCycle(0.0)
+        # speed_factor = 0.35
+        # if destination_x == -1:
+        #     angle_text = "stopp"
+        #     pwm1.ChangeDutyCycle(0.0)
+        #     pwm2.ChangeDutyCycle(0.0)
 
 
-        elif destination_x < 540 and destination_x > 420:
-            angle_text = "gerade aus"
-            pwm1.ChangeDutyCycle(speed_factor*100.0)
-            pwm2.ChangeDutyCycle(speed_factor*100.0)
+        # elif destination_x < 540 and destination_x > 420:
+        #     angle_text = "gerade aus"
+        #     pwm1.ChangeDutyCycle(speed_factor*100.0)
+        #     pwm2.ChangeDutyCycle(speed_factor*100.0)
 
 
-        elif destination_x > 540:
-            # ganz rechts ist weitester Ausschlag, wird erreicht durch größte pwm Differenz
-            lenk_faktor = (destination_x-540) / (960-540)
-            lenk_faktor = 1- lenk_faktor+0.3
-            angle_text = "rechts"
-            pwm1.ChangeDutyCycle(speed_factor*100.0)
-            pwm2.ChangeDutyCycle(speed_factor*100.0*lenk_faktor)
+        # elif destination_x > 540:
+        #     # ganz rechts ist weitester Ausschlag, wird erreicht durch größte pwm Differenz
+        #     lenk_faktor = (destination_x-540) / (960-540)
+        #     lenk_faktor = 1- lenk_faktor+0.3
+        #     angle_text = "rechts"
+        #     pwm1.ChangeDutyCycle(speed_factor*100.0)
+        #     pwm2.ChangeDutyCycle(speed_factor*100.0*lenk_faktor)
         
 
 
-        elif destination_x < 420:
-            lenk_faktor = destination_x / 420
-            lenk_faktor = lenk_faktor + 0.3
-            angle_text = "links"
-            pwm1.ChangeDutyCycle(speed_factor*100.0*lenk_faktor)
-            pwm2.ChangeDutyCycle(speed_factor*100.0)
+        # elif destination_x < 420:
+        #     lenk_faktor = destination_x / 420
+        #     lenk_faktor = lenk_faktor + 0.3
+        #     angle_text = "links"
+        #     pwm1.ChangeDutyCycle(speed_factor*100.0*lenk_faktor)
+        #     pwm2.ChangeDutyCycle(speed_factor*100.0)
        
 
 
-        else: 
-            angle_text = "error"
-            pwm1.ChangeDutyCycle(0)
-            pwm2.ChangeDutyCycle(0)
+        # else: 
+        #     angle_text = "error"
+        #     pwm1.ChangeDutyCycle(0)
+        #     pwm2.ChangeDutyCycle(0)
 
         # speed_factor = 0
         # if angle < 5.0 and angle > -5.0:
@@ -198,7 +198,7 @@ def captureFrames():
 
         
         
-        cv2.putText(frame,angle_text,(50,100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+        # cv2.putText(frame,angle_text,(50,100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
         # cv2.putText(frame,str(destination_x),(50,180), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
 
         
