@@ -8,6 +8,10 @@ import subprocess
 
 pwm_pin_motor_rechts = 32
 pwm_pin_motor_links = 33
+pin_motor_rechts_vor = 35
+pin_motor_rechts_zurueck = 36
+pin_motor_links_vor = 37
+pin_motor_links_zurueck = 38
 
 # Controller Variable hier setzen
 controller = "xbox"
@@ -32,6 +36,10 @@ GPIO.setwarnings(False)
 
 GPIO.setup(pwm_pin_motor_rechts, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(pwm_pin_motor_links, GPIO.OUT,initial=GPIO.LOW)
+GPIO.setup(pin_motor_rechts_vor, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
+GPIO.setup(pin_motor_rechts_zurueck, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
+GPIO.setup(pin_motor_links_vor, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
+GPIO.setup(pin_motor_links_zurueck, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
 pwm1 = GPIO.PWM(pwm_pin_motor_rechts, 100)
 pwm2 = GPIO.PWM(pwm_pin_motor_links, 100)
 valpwm1 = 0
@@ -51,18 +59,69 @@ try:
         rt = rt.replace("(","")
         rt = rt.replace(",","")
         rt = float(rt)
-        valpwm2 = rt*100.0
-
-        valpwm1 = valpwm2
         ls = float(ls)
+        lt = xboxcontroller.ausgabe("lt")
+        lt = truncate(lt , 3)
+        lt = lt.replace("(","")
+        lt = lt.replace(",","")
+        lt = float(lt)
 
+        print(lt)
+        print(rt)
+        print(ls)
 
-        if(ls < 0.00):
-            ls = ls * (-1)
-            valpwm1 = valpwm1 * (1- ls)
+        #setze PWM bei Fahrt nach vorne
+        if(rt > 0.00) and (lt <= 0.05):
+            GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
+            GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
+            GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
+            GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+
+            valpwm2 = rt*100.0
+            valpwm1 = valpwm2
             
-        elif(ls >= 0.00):
-            valpwm2 = valpwm2 * (1- ls)
+            if(ls < 0.00):
+                ls = ls * (-1)
+                valpwm1 = valpwm1 * (1- ls)
+            
+            elif(ls >= 0.00):
+                valpwm2 = valpwm2 * (1- ls)
+        
+        elif(lt > 0.00) and (rt <= 0.05):
+            GPIO.output(pin_motor_rechts_vor, GPIO.LOW)
+            GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
+            GPIO.output(pin_motor_links_vor, GPIO.LOW)
+            GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
+
+            valpwm2 = lt*100.0
+            valpwm1 = valpwm2
+
+            if(ls < 0.00):
+                ls = ls * (-1)
+                valpwm1 = valpwm1 * (1- ls)
+            
+            elif(ls >= 0.00):
+                valpwm2 = valpwm2 * (1- ls)
+
+        elif (rt <=0.05) and (lt <=0.05) and ((ls <= 0.05) or (ls>= (-0.05))):
+            GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
+            GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
+            GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+            GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
+
+            valpwm1 = 100.00
+            valpwm2 = 100.00
+
+        elif (rt <=0.05) and (lt <=0.05) and (ls >= 0.05):
+            GPIO.output(pin_motor_rechts_vor, GPIO.LOW)
+            GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
+            GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
+            GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+
+            valpwm1 = ls*100.00
+            valpwm2 = valpwm1
+
+        
 
         valpwm1 = format(valpwm1, '.1f')  
         valpwm2 = format(valpwm2, '.1f')        
