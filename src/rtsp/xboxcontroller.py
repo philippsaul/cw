@@ -13,6 +13,14 @@ def ausgabe(argument):
         return joy.leftStick()
     elif(argument == "lt"):
             return joy.leftTrigger()
+    elif(argument == "xb"):
+        return joy.X()
+    elif(argument == "yb"):
+        return joy.Y()
+    elif(argument == "ab"):
+        return joy.A()
+    elif(argument == "bb"):
+        return joy.B()
 
 # while True:
 #     print(joy.rightTrigger())

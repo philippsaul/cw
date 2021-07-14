@@ -21,7 +21,7 @@ min_load = 25.00                    #definiert das geringst möglich PWM Signal 
 circle_thr_max = 35.00              #"Radius" bezogen auf PWM Kurve
 circle_thr_min = 25.00
 
-tempomat = False                    #definiert Start-Zustand für Tempomat
+tempomat = False                   #definiert Start-Zustand für Tempomat
 
 # Controller Variable hier setzen
 controller = "xbox"
@@ -77,10 +77,19 @@ try:
         lt = float(lt)
 
         #Buttonabfrage für Tempomat
-        xb = xboxcontroller.ausgabe("xb")
-        yb = xboxcontroller.ausgabe("yb")
-        ab = xboxcontroller.ausgabe("ab")
-        bb = xboxcontroller.ausgabe("bb")
+        if(tempomat):
+            yb = xboxcontroller.ausgabe("yb")
+            ab = xboxcontroller.ausgabe("ab")
+            bb = xboxcontroller.ausgabe("bb")
+            if(bb == 1):
+                tempomat = False
+        else:    
+            xb = xboxcontroller.ausgabe("xb")
+            if(xb == 1):
+                tempomat = True
+
+        print(tempomat)
+        
 
         # print(lt)
         # print(rt)
@@ -125,7 +134,7 @@ try:
                 valpwm1 = aim_boost
                 valpwm2 = aim_boost
         
-        elif(lt > 0.00) and (rt <= con_thr):
+        elif(lt > 0.00) and (rt <= con_thr) and (not tempomat):
             GPIO.output(pin_motor_rechts_vor, GPIO.LOW)
             GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
             GPIO.output(pin_motor_links_vor, GPIO.LOW)
@@ -188,7 +197,7 @@ try:
 
             anlaufboost = False
 
-        elif (rt <=con_thr) and (lt <=con_thr) and ((ls <= con_thr) or (ls>= (-con_thr))) and (not tempomat):
+        elif (rt <=con_thr) and (lt <=con_thr) and ((ls <= con_thr) or (ls>= (-con_thr)) and (not tempomat)):
             GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)    
             GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
             GPIO.output(pin_motor_links_vor, GPIO.HIGH)
@@ -202,8 +211,8 @@ try:
         
         valpwm1 = format(valpwm1, '.1f')  
         valpwm2 = format(valpwm2, '.1f')        
-        # print(valpwm1)
-        # print(valpwm2)
+        print(valpwm1)
+        print(valpwm2)
         #print("___________")
 
         valpwm1 = float(valpwm1)
