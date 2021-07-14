@@ -260,10 +260,10 @@ class Controller(Actions):
         def unpack():
             __event = struct.unpack(self.event_format, event)
             # uncomment to see which pins are in use
-            # print(str(__event[3]) + ' '+str( __event[4])  + ' '+ str(__event[5]))
+            print(str(__event[3]) + ' '+str( __event[4])  + ' '+ str(__event[5]))
             if __event[4] == 2 and __event[5] == 0:
                 self.ls = __event[3]
-            elif __event[4] == 2 and __event[5] == 5:
+            elif __event[4] == 2 and __event[5] == 4:
                 self.rt = __event[3]
             elif __event[4] == 2 and __event[5] == 2:
                 self.lt = __event[3]

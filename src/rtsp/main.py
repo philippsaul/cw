@@ -25,6 +25,7 @@ circle_thr_min = 25.00
 
 tempomat = False                   #definiert Start-Zustand für Tempomat
 tem_val = 0
+tem_vel = 0.0
 
 # Controller Variable hier setzen
 controller = "xbox"
@@ -81,6 +82,13 @@ try:
             lt = lt.replace("(","")
             lt = lt.replace(",","")
             lt = float(lt)
+
+            #Buttonabfrage für Tempomat
+            yb = xboxcontroller.ausgabe("yb")
+            ab = xboxcontroller.ausgabe("ab")
+            bb = xboxcontroller.ausgabe("bb")
+            xb = xboxcontroller.ausgabe("xb")
+
         elif(controller == "ps4"):
             ls = (ps4.ls + 32767)/65534
             rt = (ps4.rt + 32767)/65534
@@ -89,17 +97,11 @@ try:
             print("Falsche Controller Variable: ps4/xbox")
 
         
-
-        # #Buttonabfrage für Tempomat
-        # yb = xboxcontroller.ausgabe("yb")
-        # ab = xboxcontroller.ausgabe("ab")
-        # bb = xboxcontroller.ausgabe("bb")
-        # xb = xboxcontroller.ausgabe("xb")
-        # if(bb == 1):
-        #     tempomat = False
-        #     tem_vel = 0
-        # elif(xb == 1):
-        #     tempomat = True
+        if(bb == 1):
+            tempomat = False
+            tem_val = 0
+        elif(xb == 1):
+            tempomat = True
 
         # print(tempomat)
         # print(lt)
@@ -109,17 +111,97 @@ try:
 
 
         if(tempomat):
-            # if(yb == 1) and (tem_val < 2):
-            #     tem_val = tem_val + 1
-            # elif(ab == 1) and (tem_val > 1):
-            #     tem_val = tem_val - 1
+            if(yb == 1) and (tem_val < 3):
+                tem_val = tem_val + 1
+            elif(ab == 1) and (tem_val > 0):
+                tem_val = tem_val - 1
+
+
+            if(tem_val == 0):
+                
+                if (ls >= con_thr):
+                    GPIO.output(pin_motor_rechts_vor, GPIO.LOW)
+                    GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
+                    GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
+                    GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+
+                    # valpwm1 = ls*100.00
+                    # valpwm2 = valpwm1
+                    valpwm1 = 30
+                    valpwm2 = 30
+
+                    anlaufboost = False
+
+                elif (ls <= (-con_thr)):
+                    GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
+                    GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
+                    GPIO.output(pin_motor_links_vor, GPIO.LOW)
+                    GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
+
+                    # valpwm1 = -(ls*100.00)
+                    # valpwm2 = valpwm1
+                    valpwm1 = 30
+                    valpwm2 = 30
+
+                    anlaufboost = False
+
+                elif ((ls <= con_thr) or (ls>= (-con_thr))):
+                    GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)    
+                    GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
+                    GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+                    GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
+
+                    valpwm1 = 100.00
+                    valpwm2 = 100.00
+
+                    anlaufboost = True
+
+            else:
+                if(tem_val == 1):
+                    tem_vel = 0.0
+                elif(tem_val == 2):
+                    tem_vel = 0.5
+                elif(tem_val == 3):
+                    tem_vel = 1
+                
+                # print(tem_vel)
+                GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
+                GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
+                GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
+                GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+
+                valpwm2 = tem_vel * (100.0 - min_load) + min_load
+                valpwm1 = valpwm2
+                circle_act = circle_thr_min + (circle_thr_max - circle_thr_min) * tem_vel
+
+                if(ls < 0.00):
+                    ls = ls * (-1)
+                    valpwm2 = valpwm2 + circle_act * ls
+                    valpwm1 = valpwm1 - circle_act * ls
+
+                elif(ls >= 0.00):
+                    valpwm1 = valpwm1 + circle_act * ls
+                    valpwm2 = valpwm2 - circle_act * ls
+
+                if(valpwm1 > 100.00):
+                    valpwm2 = valpwm2 - (valpwm1 - 100.00)
+                    valpwm1 = 100.0
+                elif(valpwm1 < min_load):
+                    valpwm2 = valpwm2 + (min_load - valpwm1)
+                    valpwm1 = min_load
+                elif(valpwm2 > 100.00):
+                    valpwm1 = valpwm1 - (valpwm2 - 100.00)
+                    valpwm2 = 100.0
+                elif(valpwm2 < min_load):
+                    valpwm1 = valpwm1 + (min_load - valpwm2)
+                    valpwm2 = min_load
+
+                if(anlaufboost):
+                    anlaufboost = False
+                    valpwm1 = aim_boost
+                    valpwm2 = aim_boost
+
         
-            # if(tem_val > 0):
-            #     print(tem_val)
-            # elif(tem_val == 0):
-            #     print(tem_val)
-            print()
-            
         elif(rt > 0.00) and (lt <= con_thr):                        #setze PWM bei Fahrt nach vorne
             GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
             GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
