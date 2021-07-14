@@ -45,11 +45,15 @@ pwm1.start(valpwm1)
 pwm2.start(valpwm2)
 
 
+
+
 def captureFrames():
     global video_frame, thread_lock
 
     # Video capturing from OpenCV
     video_capture = cv2.VideoCapture(GSTREAMER_PIPELINE, cv2.CAP_GSTREAMER)
+
+    last_timestamp = time.time()
 
     while True and video_capture.isOpened():
         return_key, frame = video_capture.read()
@@ -129,7 +133,7 @@ def captureFrames():
         
         angle = np.average(angles)    
         
-        speed_factor = 0.5
+        speed_factor = 0.35
         if destination_x == -1:
             angle_text = "stopp"
             pwm1.ChangeDutyCycle(0.0)
@@ -142,24 +146,23 @@ def captureFrames():
             pwm2.ChangeDutyCycle(speed_factor*100.0)
 
 
-        elif destination_x > 540 and destination_x < 650:
-            angle_text = "bisschen rechts"
+        elif destination_x > 540:
+            # ganz rechts ist weitester Ausschlag, wird erreicht durch größte pwm Differenz
+            lenk_faktor = (destination_x-540) / (960-540)
+            lenk_faktor = 1- lenk_faktor+0.3
+            angle_text = "rechts"
             pwm1.ChangeDutyCycle(speed_factor*100.0)
-            pwm2.ChangeDutyCycle(speed_factor*60.0)
-        elif destination_x > 650:
-            angle_text = "stark rechts"
-            pwm1.ChangeDutyCycle(speed_factor*90.0)
-            pwm2.ChangeDutyCycle(speed_factor*40.0)
+            pwm2.ChangeDutyCycle(speed_factor*100.0*lenk_faktor)
+        
 
 
-        elif destination_x < 420 and destination_x > 310:
-            angle_text = "bisschen links"
-            pwm1.ChangeDutyCycle(speed_factor*60.0)
+        elif destination_x < 420:
+            lenk_faktor = destination_x / 420
+            lenk_faktor = lenk_faktor + 0.3
+            angle_text = "links"
+            pwm1.ChangeDutyCycle(speed_factor*100.0*lenk_faktor)
             pwm2.ChangeDutyCycle(speed_factor*100.0)
-        elif destination_x < 310:
-            angle_text = "stark links"
-            pwm1.ChangeDutyCycle(speed_factor*40.0)
-            pwm2.ChangeDutyCycle(speed_factor*90.0)
+       
 
 
         else: 
@@ -192,9 +195,20 @@ def captureFrames():
         #     angle_text = "error"
         #     pwm1.ChangeDutyCycle(0)
         #     pwm2.ChangeDutyCycle(0)
+
+        
+        
         cv2.putText(frame,angle_text,(50,100), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
-        cv2.putText(frame,str(destination_x),(50,180), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
-        frame = cv2.addWeighted(frame, 0.8, line_image, 10, 0)
+        # cv2.putText(frame,str(destination_x),(50,180), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+
+        
+        # time measurement
+        # timestamp = time.time()
+        
+        # cv2.putText(frame,str(1/(timestamp - last_timestamp)),(50,180), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+        # frame = cv2.addWeighted(frame, 0.8, line_image, 10, 0)
+        # last_timestamp = timestamp
+
 
         # line with pwm gpio motor run
         # pwm1.ChangeDutyCycle(100)
