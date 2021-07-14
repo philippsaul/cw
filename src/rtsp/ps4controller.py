@@ -1,6 +1,7 @@
 # from ps4test import Controller
 from ps4test import Controller
 import threading
+import time
 
 class MyController(Controller):
 
@@ -17,4 +18,5 @@ download_thread.start()
 # controller.listen(timeout=60)
 while True:
     print(controller.xb)
+    # time.sleep(0.1)
 
