@@ -22,6 +22,7 @@ circle_thr_max = 35.00              #"Radius" bezogen auf PWM Kurve
 circle_thr_min = 25.00
 
 tempomat = False                   #definiert Start-Zustand für Tempomat
+tem_val = 0
 
 # Controller Variable hier setzen
 controller = "xbox"
@@ -76,28 +77,37 @@ try:
         lt = lt.replace(",","")
         lt = float(lt)
 
-        #Buttonabfrage für Tempomat
-        if(tempomat):
-            yb = xboxcontroller.ausgabe("yb")
-            ab = xboxcontroller.ausgabe("ab")
-            bb = xboxcontroller.ausgabe("bb")
-            if(bb == 1):
-                tempomat = False
-        else:    
-            xb = xboxcontroller.ausgabe("xb")
-            if(xb == 1):
-                tempomat = True
+        # #Buttonabfrage für Tempomat
+        # yb = xboxcontroller.ausgabe("yb")
+        # ab = xboxcontroller.ausgabe("ab")
+        # bb = xboxcontroller.ausgabe("bb")
+        # xb = xboxcontroller.ausgabe("xb")
+        # if(bb == 1):
+        #     tempomat = False
+        #     tem_vel = 0
+        # elif(xb == 1):
+        #     tempomat = True
 
-        print(tempomat)
-        
-
+        # print(tempomat)
         # print(lt)
         # print(rt)
         # print(ls)
         # print(xb)
 
-        #setze PWM bei Fahrt nach vorne
-        if(rt > 0.00) and (lt <= con_thr):
+
+        if(tempomat):
+            # if(yb == 1) and (tem_val < 2):
+            #     tem_val = tem_val + 1
+            # elif(ab == 1) and (tem_val > 1):
+            #     tem_val = tem_val - 1
+        
+            # if(tem_val > 0):
+            #     print(tem_val)
+            # elif(tem_val == 0):
+            #     print(tem_val)
+            print()
+            
+        elif(rt > 0.00) and (lt <= con_thr):                        #setze PWM bei Fahrt nach vorne
             GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
             GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
             GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
