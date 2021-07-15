@@ -44,6 +44,8 @@ elif(controller == "ps4"):
     ps4 = Controller(interface="/dev/input/js0", connecting_using_ds4drv=False)
     ps4_thread = threading.Thread(target=ps4.listen, name="test")
     ps4_thread.start()
+    while ps4.ls != 0 and ps4.lt != 0 and ps4.rt != 0:
+        continue
 else:
     print("Falsche Controller Variable: ps4/xbox")
 
