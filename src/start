@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo python3 main.py & python3 web_streaming.py
+sudo python3 steering/main.py & python3 webstream/web_streaming.py
