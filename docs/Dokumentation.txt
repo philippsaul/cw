@@ -1,0 +1,24 @@
+#PWM Enable
+
+    INFO: Verwendete Lib https://github.com/NVIDIA/jetson-gpio
+
+    Installation:
+        sudo pip install Jetson.GPIO
+        (Alternative manuelle Installation: sudo python3 setup.py install)
+
+
+    WICHTTIG: 	Setting User Permissions ausführen
+                sudo groupadd -f -r gpio
+                sudo usermod -a -G gpio your_user_name
+
+                #Erstelle mit nano eine Dateo 99-gpio.rules in dem Ordner: /etc/udev/rules.d/
+                # Von https://github.com/NVIDIA/jetson-gpio/blob/master/lib/python/Jetson/GPIO/99-gpio.rules Inhalt in die erstelle Datei kopieren
+                sudo reboot #(reboot auch nach Schritt 2 möglich, wenn dieser ausgeführt wird)
+
+
+    WICHTTIG: 	PWM Pins aktivieren (root Verzeichnis) über
+                sudo /opt/nvidia/jetson-io/jetson-io.py
+                -> Configure 40-pin expansion header
+                -> Aktiviere PWM Kanäle
+                -> Save and reboot to reconfigure pins
+
