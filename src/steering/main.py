@@ -5,8 +5,6 @@ import subprocess
 from ps4test import Controller
 import threading
 
-#subprocess.run('python3 web_streaming.py')
-
 
 pwm_pin_motor_rechts = 32
 pwm_pin_motor_links = 33
@@ -33,9 +31,12 @@ tempomat = False                   #definiert Start-Zustand für Tempomat; nicht
 tem_val = 0
 tem_vel = 0.0
 
+
 # Controller Variable hier setzen
 # controller = "xbox"
 controller = "ps4"
+
+
 def truncate(f, n):
     '''Truncates/pads a float f to n decimal places without rounding'''
     s = '{}'.format(f)

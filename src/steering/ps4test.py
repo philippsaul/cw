@@ -210,7 +210,7 @@ class Controller(Actions):
         self.ab = 0
         self.xb = 0
 
-    def listen(self, timeout=30, on_connect=None, on_disconnect=None, on_sequence=None):
+    def listen(self, timeout=120, on_connect=None, on_disconnect=None, on_sequence=None):
         """
         Start listening for events on a given self.interface
         :param timeout: INT, seconds. How long you want to wait for the self.interface.

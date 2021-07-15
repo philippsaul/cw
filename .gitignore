@@ -1,2 +1,4 @@
-src/rtsp/training_data_false/
-src/rtsp/training_data_correct/
+src/facedetection/__pycache__
+src/linedetection/__pycache__
+src/steering/__pycache__
+src/webstream/__pycache__
