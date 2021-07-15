@@ -2,7 +2,7 @@ import Jetson.GPIO as GPIO
 import time
 import os
 import subprocess
-from ps4test import Controller
+from ps4 import Controller
 import threading
 
 

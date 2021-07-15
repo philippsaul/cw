@@ -12,7 +12,7 @@ def ausgabe(argument):
     elif(argument == "ls"):
         return joy.leftStick()
     elif(argument == "lt"):
-            return joy.leftTrigger()
+        return joy.leftTrigger()
     elif(argument == "xb"):
         return joy.X()
     elif(argument == "yb"):
