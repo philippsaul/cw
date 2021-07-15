@@ -28,8 +28,8 @@ tem_val = 0
 tem_vel = 0.0
 
 # Controller Variable hier setzen
-controller = "xbox"
-# controller = "ps4"
+# controller = "xbox"
+controller = "ps4"
 def truncate(f, n):
     '''Truncates/pads a float f to n decimal places without rounding'''
     s = '{}'.format(f)
@@ -90,9 +90,18 @@ try:
             xb = xboxcontroller.ausgabe("xb")
 
         elif(controller == "ps4"):
-            ls = (ps4.ls + 32767)/65534
+            # ls = (ps4.ls + 32767)/65534
+            ls = ps4.ls/32767
             rt = (ps4.rt + 32767)/65534
             lt = (ps4.lt + 32767)/65534
+            yb = ps4.yb
+            ab = ps4.ab
+            bb = ps4.bb
+            xb = ps4.xb
+
+            print("ab")
+            print(ab)
+
         else:
             print("Falsche Controller Variable: ps4/xbox")
 
@@ -316,8 +325,8 @@ try:
         
         valpwm1 = format(valpwm1, '.1f')  
         valpwm2 = format(valpwm2, '.1f')        
-        print(valpwm1)
-        print(valpwm2)
+        # print(valpwm1)
+        # print(valpwm2)
         #print("___________")
 
         valpwm1 = float(valpwm1)
