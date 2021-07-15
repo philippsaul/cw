@@ -33,8 +33,8 @@ tem_vel = 0.0
 
 
 # Controller Variable hier setzen
-# controller = "xbox"
-controller = "ps4"
+controller = "xbox"
+# controller = "ps4"
 
 
 def truncate(f, n):
