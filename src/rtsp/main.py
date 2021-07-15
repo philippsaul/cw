@@ -15,15 +15,21 @@ pin_motor_rechts_zurueck = 36
 pin_motor_links_vor = 37
 pin_motor_links_zurueck = 38
 
+
+#Folgender Wert kann pro Controller angepasst werden
 con_thr = 0.05                      #definiert nicht berüksichtigte Eingaben vom Gamepad / von 0 bis +/-con_thr
 
-anlaufboost = True                  #setzt Anfangszustand, um den Anlaufwiderstand der Motoren zu überwinden
+anlaufboost = True                  #setzt Anfangszustand, um den Anlaufwiderstand der Motoren zu überwinden; nicht verändern
+
+#Folgenden vier Werte können pro JetBot angepasst werden
 aim_boost = 35.00                   #definiert den kurzeitigen Zielzustand, um den Anlaufwiderstand zu überwinden
 min_load = 25.00                    #definiert das geringst möglich PWM Signal von 0 bis 100, sodass die Motoren nach Überwindung des Anlaufwiderstandes noch funktionieren
 circle_thr_max = 35.00              #"Radius" bezogen auf PWM Kurve
 circle_thr_min = 25.00
 
-tempomat = False                   #definiert Start-Zustand für Tempomat
+tempomat = False                   #definiert Start-Zustand für Tempomat; nicht verändern
+
+
 tem_val = 0
 tem_vel = 0.0
 
@@ -98,9 +104,6 @@ try:
             ab = ps4.ab
             bb = ps4.bb
             xb = ps4.xb
-
-            print("ab")
-            print(ab)
 
         else:
             print("Falsche Controller Variable: ps4/xbox")
@@ -178,6 +181,9 @@ try:
                 GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
                 GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
                 GPIO.output(pin_motor_links_vor, GPIO.HIGH)
+
+                if(rt > tem_vel):
+                    tem_vel = rt
 
                 valpwm2 = tem_vel * (100.0 - min_load) + min_load
                 valpwm1 = valpwm2
