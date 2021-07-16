@@ -175,6 +175,9 @@ class Motors:
             self.valpwm1 = self.aim_boost
             self.valpwm2 = self.aim_boost
 
+    def setSteering(self, speed, ls):
+        self.calculateSteering(speed, ls)
+        self.drive(self.valpwm1, self.valpwm2, "forward")
 
     #Control the JetBot with Gamepad-Input
     def gamepadcontroll(self, lt, rt, ls, ab, bb, xb, yb):
