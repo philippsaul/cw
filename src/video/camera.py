@@ -18,7 +18,7 @@ class Camera:
             self.return_key, self.frame = self.video_capture.read()
             if not self.return_key:
                 return -1
-            cv2.imwrite("test.jpg", self.frame)
+            # cv2.imwrite("test.jpg", self.frame)
             return self.frame
 
     def close(self):
