@@ -4,9 +4,11 @@ import xbox
 # Format floating point number to string format -x.xxx
 def fmtFloat(n):
     return '{:6.3f}'.format(n)
-joy = xbox.Joystick() 
 
-def ausgabe(argument):
+def openController():
+    return xbox.Joystick() 
+
+def ausgabe(joy, argument):
     if(argument == "rt"):
         return joy.rightTrigger()
     elif(argument == "ls"):
@@ -22,8 +24,4 @@ def ausgabe(argument):
     elif(argument == "bb"):
         return joy.B()
 
-# while True:
-#     print(joy.rightTrigger())
-#     print(joy.leftTrigger())
 
-#joy.close()
