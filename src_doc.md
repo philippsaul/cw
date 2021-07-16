@@ -71,3 +71,21 @@ while True:
     myMotors.gamepadcontroll(myGamepad.lt, myGamepad.rt, myGamepad.ls, 
             myGamepad.ab, myGamepad.bb, myGamepad.xb, myGamepad.yb)
 ````
+
+## Get Pictures from Camera:
+````python 
+from video.camera import Camera
+
+myCam = Camera()
+frame = myCam.getFrame()
+````
+## Create Webstream:
+````python
+from video import web_streaming
+
+stream_thread = threading.Thread(target=web_streaming.start, name="test")
+stream_thread.start()
+
+# take picture from cam and save it in variable *frame*
+web_streaming.video_frame = frame
+````
