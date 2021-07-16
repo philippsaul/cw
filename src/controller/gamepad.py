@@ -2,14 +2,25 @@ import sys
 import configparser
 import socket
 import threading
-import xboxcontroller
-from ps4 import Controller
+
+try: 
+    from controller import xboxcontroller
+except:
+    import xboxcontroller
+
+try:
+    from controller.ps4 import Controller
+except:
+    from ps4 import Controller
 
 class Gamepad():
     def __init__(self):
         self.ls = self.rt = self.lt = self.yb = self.ab = self.bb = self.xb = 0
         self.config = configparser.ConfigParser()
-        self.config.read('../settings.ini')
+        try:
+            self.config.read('./settings.ini')
+        except:
+            self.config.read('../settings.ini')
         for section in self.config.sections():
             if self.config[section]['hostname'] == socket.gethostname():
                 self.section = self.config[section]
@@ -50,13 +61,13 @@ class Gamepad():
             self.xb = xboxcontroller.ausgabe(self.xbox, "xb")
 
         elif self.section["controller"] == "ps4":
-            self.ls = self.ps4.ls/32767
-            self.rt = (self.ps4.rt + 32767)/65534
-            self.lt = (self.ps4.lt + 32767)/65534
-            self.yb = self.ps4.yb
-            self.ab = self.ps4.ab
-            self.bb = self.ps4.bb
-            self.xb = self.ps4.xb
+            self.ls = float(self.ps4.ls/32767)
+            self.rt = float((self.ps4.rt + 32767)/65534)
+            self.lt = float((self.ps4.lt + 32767)/65534)
+            self.yb = int(self.ps4.yb)
+            self.ab = int(self.ps4.ab)
+            self.bb = int(self.ps4.bb)
+            self.xb = int(self.ps4.xb)
         else: 
             raise Exception('error in gamepad')
 

@@ -1,7 +1,9 @@
 import Jetson.GPIO as GPIO
 import time
 import threading
-import settings 
+import configparser
+import socket
+
 
 class Motors:
     def __init__(self):
@@ -28,12 +30,21 @@ class Motors:
         self.circle_thr_max = 0            
         self.circle_thr_min = 0
 
-        liste = settings.userdata()
-        self.con_thr = liste[1]
-        self.aim_boost = liste[2]                  
-        self.min_load = liste[3]                    
-        self.circle_thr_max = liste[4]            
-        self.circle_thr_min = liste[5]
+
+        self.config = configparser.ConfigParser()
+        self.config.read('./settings.ini')
+        for section in self.config.sections():
+            if self.config[section]['hostname'] == socket.gethostname():
+                self.section = self.config[section]
+                break
+        if self.section == None:
+            raise Exception("can't find hostname in settings.ini")
+
+        self.con_thr = float(self.section["deadzone_throttle"])
+        self.aim_boost = float(self.section["anlauf_boost"])                  
+        self.min_load = float(self.section["minimal_load"])                    
+        self.circle_thr_max = float(self.section["radius"])           
+        self.circle_thr_min = float(self.section["minimal_kurven_radius"])
 
         #setup jetson GPIOs for h-bridge
         GPIO.setmode(GPIO.BOARD)
@@ -45,12 +56,12 @@ class Motors:
         GPIO.setup(self.pin_motor_rechts_zurueck, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
         GPIO.setup(self.pin_motor_links_vor, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
         GPIO.setup(self.pin_motor_links_zurueck, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
-        pwm1 = GPIO.PWM(self.pwm_pin_motor_rechts, 100)
-        pwm2 = GPIO.PWM(self.pwm_pin_motor_links, 100)
+        self.pwm1 = GPIO.PWM(self.pwm_pin_motor_rechts, 100)
+        self.pwm2 = GPIO.PWM(self.pwm_pin_motor_links, 100)
 
         #start pwm session
-        pwm1.start(self.valpwm1)
-        pwm2.start(self.valpwm2)
+        self.pwm1.start(self.valpwm1)
+        self.pwm2.start(self.valpwm2)
 
     #clean up the GPIOs and PWM session
     def clean (self):
@@ -64,25 +75,30 @@ class Motors:
     #Base function to set the GPIOs for h bridge direction control
     #PINs are defined that way to avoid a short and stop of motors if not wanted
     def setPins(self, vallf, vallb, valrf, valrb):
+        # falls rechts vorwärts fahren wollen
         if(valrf > valrb):
             GPIO.output(self.pin_motor_rechts_zurueck, GPIO.LOW)
             GPIO.output(self.pin_motor_rechts_vor, GPIO.HIGH)
         elif(valrf < valrb):
             GPIO.output(self.pin_motor_rechts_vor, GPIO.LOW)
             GPIO.output(self.pin_motor_rechts_zurueck, GPIO.HIGH)
-        else:
+        elif (valrf == valrb):
             GPIO.output(self.pin_motor_rechts_vor, GPIO.HIGH)
             GPIO.output(self.pin_motor_rechts_zurueck, GPIO.HIGH)
+        else:
+            raise Exception('wrong vallf or vallb values')
 
         if(vallf > vallb):
             GPIO.output(self.pin_motor_links_zurueck, GPIO.LOW)
             GPIO.output(self.pin_motor_links_vor, GPIO.HIGH)
-        elif(valrf < valrb):
+        elif(vallf < vallb):
             GPIO.output(self.pin_motor_links_vor, GPIO.LOW)
             GPIO.output(self.pin_motor_links_zurueck, GPIO.HIGH)
+        elif (vallf == vallb):
+            GPIO.output(self.pin_motor_links_vor, GPIO.HIGH)
+            GPIO.output(self.pin_motor_links_zurueck, GPIO.HIGH)
         else:
-            GPIO.output(self.pin_motor_rechts_vor, GPIO.HIGH)
-            GPIO.output(self.pin_motor_rechts_zurueck, GPIO.HIGH)
+            raise Exception('wrong vallf or vallb values')
 
     #Base function for setting PWM Pins to targeted value
     def setPWM(self, lm, rm):
@@ -92,16 +108,11 @@ class Motors:
         rm = float(rm)
         self.pwm1.ChangeDutyCycle(lm)
         self.pwm2.ChangeDutyCycle(rm)
-        time.sleep(0.1)
+        time.sleep(0.08)
 
     #stop bot
     def stop(self):
         self.setPins(1, 1, 1, 1)
-        # kann gelöscht werden, wenn es tut
-        # GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)    
-        # GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
-        # GPIO.output(pin_motor_links_vor, GPIO.HIGH)
-        # GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
         self.setPWM(100.00, 100.00)
         self.anlaufboost = True
 
@@ -109,19 +120,8 @@ class Motors:
     def turn(self, speed, direction):
         if (direction == "right"):
             self.setPins(1, 0, 0, 1)
-            # kann gelöscht werden, wenn es funktioniert
-            # GPIO.output(pin_motor_rechts_vor, GPIO.LOW)
-            # GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
-            # GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
-            # GPIO.output(pin_motor_links_vor, GPIO.HIGH)
-
         elif (direction == "left"):
             self.setPins(0, 1, 1, 0)
-            # kann gelöscht werden, wenn es tut
-            # GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
-            # GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
-            # GPIO.output(pin_motor_links_vor, GPIO.LOW)
-            # GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
 
         self.setPWM(speed, speed)
         self.anlaufboost = False
@@ -137,19 +137,8 @@ class Motors:
     def drive(self, lm, rm, direction):
         if(direction == "forward"):
             self.setPins(1, 0, 1, 0)
-            # kann gelöscht werden, wenn es tut
-            # GPIO.output(pin_motor_rechts_zurueck, GPIO.LOW)
-            # GPIO.output(pin_motor_rechts_vor, GPIO.HIGH)
-            # GPIO.output(pin_motor_links_zurueck, GPIO.LOW)
-            # GPIO.output(pin_motor_links_vor, GPIO.HIGH)
         elif(direction == "backward"):
-            self.setPins(0, 1, 0, 1)
-            #kan gelöscht werden, wenn es tut
-            # GPIO.output(pin_motor_rechts_vor, GPIO.LOW)
-            # GPIO.output(pin_motor_rechts_zurueck, GPIO.HIGH)
-            # GPIO.output(pin_motor_links_vor, GPIO.LOW)
-            # GPIO.output(pin_motor_links_zurueck, GPIO.HIGH)
-        
+            self.setPins(0, 1, 0, 1)        
         self.setPWM(lm, rm)
 
     #calculate based on gamepad input the steering angele / velocity difference
@@ -202,7 +191,7 @@ class Motors:
                 self.tem_val = self.tem_val + 1
             elif(ab == 1) and (self.tem_val > 0):
                 self.tem_val = self.tem_val - 1
-
+            print(self.tem_val)
             #apply velocity to motors
             #if speed is zero, allwo turn or stop
             if(self.tem_val == 0):

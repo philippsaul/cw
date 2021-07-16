@@ -1,5 +1,8 @@
 from __future__ import print_function
-import xbox
+try: 
+    from controller import xbox
+except:
+    import xbox
 
 # Format floating point number to string format -x.xxx
 def fmtFloat(n):
