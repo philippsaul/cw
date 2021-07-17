@@ -22,8 +22,9 @@ def create_dataset(xs, ys, n_classes=6):
   ys = tf.one_hot(ys, depth=n_classes)
   return tf.data.Dataset.from_tensor_slices((xs, ys)) \
     .map(preprocess) \
-    .shuffle(len(ys)) \
-    .batch(18)
+      .batch(18)
+    # .shuffle(len(ys)) \
+    
 
 train_dataset = create_dataset(x_train, y_train)
 val_dataset = create_dataset(x_val, y_val)
