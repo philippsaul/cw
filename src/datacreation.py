@@ -42,15 +42,18 @@ try:
                nimm_auf = False
           elif myGamepad.lb and not nimm_auf:
                nimm_auf = True
+               i = 0
           print(nimm_auf)
+     
           
 
 
-          if i == 20 and nimm_auf:
+          if i == 10 and nimm_auf:
                print("schreibe Daten")
                i = 0
                cv2.imwrite("./linedetection/data/pic_" + str(j) + ".jpg", edges)
                datei.write(str(j) + " " + str(myGamepad.ls) + "\n")
+               print(str(j) + " " + str(myGamepad.ls) + "\n")
                j += 1
           else:
                i += 1
