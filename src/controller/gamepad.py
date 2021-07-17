@@ -15,7 +15,7 @@ except:
 
 class Gamepad():
     def __init__(self):
-        self.ls = self.rt = self.lt = self.yb = self.ab = self.bb = self.xb = 0
+        self.ls = self.rt = self.lt = self.yb = self.ab = self.bb = self.xb = self.lb = 0
         self.config = configparser.ConfigParser()
         try:
             self.config.read('./settings.ini')
@@ -68,6 +68,7 @@ class Gamepad():
             self.ab = int(self.ps4.ab)
             self.bb = int(self.ps4.bb)
             self.xb = int(self.ps4.xb)
+            self.lb = int(self.ps4.lb)
         else: 
             raise Exception('error in gamepad')
 

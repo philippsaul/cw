@@ -210,6 +210,8 @@ class Controller(Actions):
         self.ab = 0
         self.xb = 0
 
+        self.lb = 0
+
     def listen(self, timeout=120, on_connect=None, on_disconnect=None, on_sequence=None):
         """
         Start listening for events on a given self.interface
@@ -275,6 +277,8 @@ class Controller(Actions):
                 self.ab = __event[3]
             elif __event[4] == 1 and __event[5] == 0:
                 self.xb = __event[3]
+            elif __event[4] == 1 and __event[5] == 4:
+                self.lb = __event[3]
             return (__event[3:], __event[2], __event[1], __event[0])
 
         wait_for_interface()

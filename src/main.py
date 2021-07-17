@@ -19,3 +19,4 @@ while True:
      # web_streaming.video_frame = frame
      myGamepad.get_data()
      myMopets.gamepadcontroll(myGamepad.lt, myGamepad.rt, myGamepad.ls, myGamepad.ab, myGamepad.bb, myGamepad.xb, myGamepad.yb)
+     print(myGamepad.lb)
