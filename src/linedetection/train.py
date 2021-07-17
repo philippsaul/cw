@@ -26,11 +26,15 @@ def create_dataset(xs, ys, n_classes=6):
     # .shuffle(len(ys)) \
     
 
+print(np.shape(x_train))
 train_dataset = create_dataset(x_train, y_train)
 val_dataset = create_dataset(x_val, y_val)
 
+print("Traindataset")
+print(np.shape(train_dataset))
+
 model = keras.Sequential([
-    keras.layers.Reshape(target_shape=(960 * 400,), input_shape=(960, 400)),
+    keras.layers.Reshape(target_shape=(400 * 960,), input_shape=(400, 960)),
     keras.layers.Dense(units=256, activation='relu'),
     keras.layers.Dense(units=192, activation='relu'),
     keras.layers.Dense(units=128, activation='relu'),
