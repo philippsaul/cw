@@ -31,18 +31,19 @@ train_dataset = create_dataset(x_train, y_train)
 val_dataset = create_dataset(x_val, y_val)
 
 print("Traindataset")
+print(train_dataset)
 print(np.shape(train_dataset))
 
 model = keras.Sequential([
-    keras.layers.Reshape(target_shape=(400 * 960,), input_shape=(400, 960)),
+    keras.layers.Reshape((960, 400), input_shape=(960,400)),
     keras.layers.Dense(units=256, activation='relu'),
     keras.layers.Dense(units=192, activation='relu'),
     keras.layers.Dense(units=128, activation='relu'),
-    keras.layers.Dense(units=6, activation='softmax')
+    keras.layers.Dense(units=6, activation='sigmoid')
 ])
 
 model.compile(optimizer='adam', 
-              loss=tf.losses.CategoricalCrossentropy(from_logits=True),
+              loss=tf.losses.BinaryCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
 history = model.fit(
@@ -54,6 +55,7 @@ history = model.fit(
 )
 
 predictions = model.predict(val_dataset)
+model.summary()
 
 print(np.argmax(predictions[0]))
 
