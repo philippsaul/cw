@@ -21,11 +21,13 @@ def picdata():
             new_ls[element] = int(4)
         elif(float(new_ls[element]) >= -0.3 and float(new_ls[element]) <= -1.0):
             new_ls[element] = int(5)
-    # print(len(new_ls))
+    print(len(new_ls))
     for j in range(len(new_ls)):
         # print("picdata")
         # print(j)
         new_Array.append(shrinkpic(cv2.imread("./data/pic_" + str(j) + ".jpg")))
+    print("len new array")
+    print(len(new_Array))
     return new_Array, new_ls
 
 def shrinkpic(pic_Array):
@@ -43,7 +45,7 @@ def shrinkpic(pic_Array):
     # print(temp_Array)
     return temp_Array
 
-a,b = picdata()
+# a,b = picdata()
 # print(a[1])
 # print(len(a))
 
