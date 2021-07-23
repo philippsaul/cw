@@ -9,6 +9,10 @@ x_train = x_train[0:108]
 
 y_val = y_train[108:30]
 y_train = y_train[0:108]
+print("shape of x train:")
+print(np.shape(x_train))
+print("shape of y train:")
+print(np.shape(y_train))
 
 # (x_train, y_train), (x_val, y_val) = keras.datasets.fashion_mnist.load_data()
 # print(x_val[0])
@@ -25,8 +29,10 @@ def create_dataset(xs, ys, n_classes=6):
       .batch(18)
     # .shuffle(len(ys)) \
     
-
+print("shape of x train:")
 print(np.shape(x_train))
+print("shape of y train:")
+print(np.shape(y_train))
 train_dataset = create_dataset(x_train, y_train)
 val_dataset = create_dataset(x_val, y_val)
 
@@ -35,7 +41,7 @@ print(train_dataset)
 print(np.shape(train_dataset))
 
 model = keras.Sequential([
-    keras.layers.Reshape((960, 400), input_shape=(960,400)),
+    keras.layers.Reshape((960, 400), input_shape=(400,960)),
     keras.layers.Dense(units=256, activation='relu'),
     keras.layers.Dense(units=192, activation='relu'),
     keras.layers.Dense(units=128, activation='relu'),
