@@ -43,7 +43,7 @@ model = keras.Sequential([
 ])
 
 model.compile(optimizer='adam', 
-              loss=tf.losses.BinaryCrossentropy(from_logits=True),
+              loss=tf.losses.CategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
 history = model.fit(
