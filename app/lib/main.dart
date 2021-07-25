@@ -7,11 +7,14 @@ class HomePage extends StatelessWidget {
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(
-        title: Text('Control Pad Example'),
+        title: Text('JetBot Controller'),
       ),
       body: Container(
         color: Colors.white,
-        child: JoystickView(),
+        child: JoystickView(
+          opacity: 0.5,
+          onDirectionChanged: (degrees, distance) => print(degrees),
+        ),
       ),
     ));
   }
