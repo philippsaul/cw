@@ -36,7 +36,8 @@ try:
           
           web_streaming.video_frame = edges
           myGamepad.get_data()
-          myMopets.gamepadcontroll(myGamepad.lt, myGamepad.rt, myGamepad.ls, myGamepad.ab, myGamepad.bb, myGamepad.xb, myGamepad.yb)
+          # myMopets.gamepadcontroll(myGamepad.lt, myGamepad.rt, myGamepad.ls, myGamepad.ab, myGamepad.bb, myGamepad.xb, myGamepad.yb)
+          myMopets.gamepad_controll(myGamepad)
 
           if myGamepad.lb and nimm_auf:
                nimm_auf = False

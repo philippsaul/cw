@@ -230,3 +230,55 @@ class Motors:
 
         elif (rt <= self.con_thr) and (lt <= self.con_thr) and ((ls <= self.con_thr) or (ls>= (-self.con_thr)) and (not self.tempomat)):
             self.stop()
+    
+    def gamepad_controll(self, gamepad):
+        '''control motors with gamepad control and only one argument'''
+        #manage state wether velocity control is activated
+        if(gamepad.BUTTON_EAST == 1):
+            self.tempomat = False
+            self.tem_val = 0
+        elif(gamepad.BUTTON_WEST == 1):
+            self.tempomat = True
+        
+        if(self.tempomat):
+            #manage velocity of velocity control
+            if(gamepad.BUTTON_NORTH == 1) and (self.tem_val < 3):
+                self.tem_val = self.tem_val + 1
+            elif(gamepad.BUTTON_SOUTH == 1) and (self.tem_val > 0):
+                self.tem_val = self.tem_val - 1
+            print(self.tem_val)
+            #apply velocity to motors
+            #if speed is zero, allwo turn or stop
+            if(self.tem_val == 0):
+                if ((gamepad.LEFT_JOYSTICK_HORIZONTAL <= self.con_thr) or (gamepad.LEFT_JOYSTICK_HORIZONTAL>= (-self.con_thr))):
+                    self.stop()
+                else:
+                    self.turnGamepad(gamepad.LEFT_JOYSTICK_HORIZONTAL)
+            else:
+                #define speed based on velocity control for drive and calculateSteering
+                if(self.tem_val == 1):
+                    self.tem_vel = 0.0
+                elif(self.tem_val == 2):
+                    self.tem_vel = 0.5
+                elif(self.tem_val == 3):
+                    self.tem_vel = 1
+                    
+                if(gamepad.RIGHT_TRIGGER > self.tem_vel):
+                    self.tem_vel = gamepad.RIGHT_TRIGGER
+
+                self.calculateSteering(self.tem_vel, gamepad.LEFT_JOYSTICK_HORIZONTAL)
+                self.drive(self.valpwm1, self.valpwm2, "forward")
+            
+        elif(gamepad.RIGHT_TRIGGER > 0.00) and (gamepad.LEFT_TRIGGER <= self.con_thr):
+            self.calculateSteering(gamepad.RIGHT_TRIGGER, gamepad.LEFT_JOYSTICK_HORIZONTAL)
+            self.drive(self.valpwm1, self.valpwm2, "forward")
+            
+        elif(gamepad.LEFT_TRIGGER > 0.00) and (gamepad.RIGHT_TRIGGER <= self.con_thr) and (not self.tempomat):
+            self.calculateSteering(gamepad.LEFT_TRIGGER, gamepad.LEFT_JOYSTICK_HORIZONTAL)
+            self.drive(self.valpwm1, self.valpwm2, "backward")
+
+        elif (gamepad.RIGHT_TRIGGER == 0.0) and (gamepad.LEFT_TRIGGER == 0.0) and ((gamepad.LEFT_JOYSTICK_HORIZONTAL >= self.con_thr) or (gamepad.LEFT_JOYSTICK_HORIZONTAL <= (-self.con_thr))):
+            self.turnGamepad(gamepad.LEFT_JOYSTICK_HORIZONTAL)
+
+        elif (gamepad.RIGHT_TRIGGER <= self.con_thr) and (gamepad.LEFT_TRIGGER <= self.con_thr) and ((gamepad.LEFT_JOYSTICK_HORIZONTAL <= self.con_thr) or (gamepad.LEFT_JOYSTICK_HORIZONTAL>= (-self.con_thr)) and (not self.tempomat)):
+            self.stop()
