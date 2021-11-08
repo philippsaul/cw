@@ -1,5 +1,4 @@
-# :beers::beers: Campuswoche 2021 in Gelsenkirchen :beers::beers:
-Have some fun and drink beer.
+# How2 setup the Robot:
 
 Follow the official instructions about how to set up the jetson nano:
 [NVIDIA JETSON NANO](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-2gb-devkit)
