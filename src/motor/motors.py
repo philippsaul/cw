@@ -8,31 +8,27 @@ import socket
 class Motors:
     def __init__(self):
         #definition of motor control pins on Jetson Nano
-        self.pwm_pin_motor_rechts = 32
-        self.pwm_pin_motor_links = 33
-        self.pin_motor_rechts_vor = 35
-        self.pin_motor_rechts_zurueck = 36
-        self.pin_motor_links_vor = 37
-        self.pin_motor_links_zurueck = 38
+        self.pin_pwm_motor_rechts = 32
+        self.pin_pwm_motor_links = 33
+        self.pin_motor_rechts_richtung = 35
+        self.pin_motor_links_richtung = 36
 
-        #set working variable for working control
-        self.anlaufboost = True
-        self.tempomat = False
-        self.tem_val = 0
-        self.tem_vel = 0.0
-        self.valpwm1 = 0
-        self.valpwm2 = 0
+        # self.pwm_previous_value_left = 0
+        # self.pwm_previous_value_right = 0
+        self.pwm_value_left = 0
+        self.pwm_value_right = 0
         self.pwm1= 0
         self.pwm2 = 0
+
+        self.max_speed = 0
+        # self.max_acc = 0
         self.con_thr = 0
-        self.aim_boost = 0                  
-        self.min_load = 0                    
-        self.circle_thr_max = 0            
-        self.circle_thr_min = 0
+        self.con_str = 0
 
 
         self.config = configparser.ConfigParser()
         self.config.read('./settings.ini')
+        
         for section in self.config.sections():
             if self.config[section]['hostname'] == socket.gethostname():
                 self.section = self.config[section]
@@ -40,28 +36,24 @@ class Motors:
         if self.section == None:
             raise Exception("can't find hostname in settings.ini")
 
+        self.max_speed = float(self.section["max_speed"])
+        # self.max_acc = float(self.section["max_acc"])
         self.con_thr = float(self.section["deadzone_throttle"])
-        self.aim_boost = float(self.section["anlauf_boost"])                  
-        self.min_load = float(self.section["minimal_load"])                    
-        self.circle_thr_max = float(self.section["radius"])           
-        self.circle_thr_min = float(self.section["minimal_kurven_radius"])
+        self.con_str = float(self.section["deadzone_stearing"])
 
-        #setup jetson GPIOs for h-bridge
         GPIO.setmode(GPIO.BOARD)
         GPIO.setwarnings(False)
 
-        GPIO.setup(self.pwm_pin_motor_rechts, GPIO.OUT, initial=GPIO.LOW)
-        GPIO.setup(self.pwm_pin_motor_links, GPIO.OUT,initial=GPIO.LOW)
-        GPIO.setup(self.pin_motor_rechts_vor, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
-        GPIO.setup(self.pin_motor_rechts_zurueck, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
-        GPIO.setup(self.pin_motor_links_vor, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
-        GPIO.setup(self.pin_motor_links_zurueck, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
-        self.pwm1 = GPIO.PWM(self.pwm_pin_motor_rechts, 100)
-        self.pwm2 = GPIO.PWM(self.pwm_pin_motor_links, 100)
+        GPIO.setup(self.pin_pwm_motor_rechts, GPIO.OUT, initial=GPIO.LOW)
+        GPIO.setup(self.pin_pwm_motor_links, GPIO.OUT,initial=GPIO.LOW)
+        GPIO.setup(self.pin_motor_rechts_richtung, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
+        GPIO.setup(self.pin_motor_links_richtung, GPIO.OUT, initial=GPIO.LOW)       #setup direction status
+        self.pwm1 = GPIO.PWM(self.pin_pwm_motor_rechts, 100)
+        self.pwm2 = GPIO.PWM(self.pin_pwm_motor_links, 100)
 
         #start pwm session
-        self.pwm1.start(self.valpwm1)
-        self.pwm2.start(self.valpwm2)
+        self.pwm1.start(self.pwm_value_left)
+        self.pwm2.start(self.pwm_value_right)
 
     #clean up the GPIOs and PWM session
     def clean (self):
@@ -72,213 +64,73 @@ class Motors:
     def __del__ (self):
         self.clean()
     
-    #Base function to set the GPIOs for h bridge direction control
-    #PINs are defined that way to avoid a short and stop of motors if not wanted
-    def setPins(self, vallf, vallb, valrf, valrb):
-        # falls rechts vorwärts fahren wollen
-        if(valrf > valrb):
-            GPIO.output(self.pin_motor_rechts_zurueck, GPIO.LOW)
-            GPIO.output(self.pin_motor_rechts_vor, GPIO.HIGH)
-        elif(valrf < valrb):
-            GPIO.output(self.pin_motor_rechts_vor, GPIO.LOW)
-            GPIO.output(self.pin_motor_rechts_zurueck, GPIO.HIGH)
-        elif (valrf == valrb):
-            GPIO.output(self.pin_motor_rechts_vor, GPIO.HIGH)
-            GPIO.output(self.pin_motor_rechts_zurueck, GPIO.HIGH)
-        else:
-            raise Exception('wrong vallf or vallb values')
 
-        if(vallf > vallb):
-            GPIO.output(self.pin_motor_links_zurueck, GPIO.LOW)
-            GPIO.output(self.pin_motor_links_vor, GPIO.HIGH)
-        elif(vallf < vallb):
-            GPIO.output(self.pin_motor_links_vor, GPIO.LOW)
-            GPIO.output(self.pin_motor_links_zurueck, GPIO.HIGH)
-        elif (vallf == vallb):
-            GPIO.output(self.pin_motor_links_vor, GPIO.HIGH)
-            GPIO.output(self.pin_motor_links_zurueck, GPIO.HIGH)
-        else:
-            raise Exception('wrong vallf or vallb values')
+
 
     #Base function for setting PWM Pins to targeted value
-    def setPWM(self, lm, rm):
-        lm = format(lm, '.1f')  
-        rm = format(rm, '.1f')
-        lm = float(lm)
-        rm = float(rm)
-        self.pwm1.ChangeDutyCycle(lm)
-        self.pwm2.ChangeDutyCycle(rm)
-        time.sleep(0.08)
+    def setPWM(self, left_motor, right_motor):
+        left_motor = format(left_motor, '.1f')  
+        right_motor = format(right_motor, '.1f')
+        left_motor = float(left_motor)
+        right_motor = float(right_motor)
 
-    #stop bot
-    def stop(self):
-        self.setPins(1, 1, 1, 1)
-        self.setPWM(100.00, 100.00)
-        self.anlaufboost = True
+        if (left_motor <= 100.0) and (left_motor >= 0.0):
+            self.pwm1.ChangeDutyCycle(left_motor)
+        else:
+            self.pwm1.ChangeDutyCycle(0)
+            self.pwm2.ChangeDutyCycle(0)
+            raise Exception('PWM1 value out of range')
 
-    #turn Jetbot on single point
-    def turn(self, speed, direction):
-        if (direction == "right"):
-            self.setPins(1, 0, 0, 1)
-        elif (direction == "left"):
-            self.setPins(0, 1, 1, 0)
-
-        self.setPWM(speed, speed)
-        self.anlaufboost = False
-
-    #turn Jetbot on single point with Gamepad Left Stick input
-    def turnGamepad(self, ls):
-        if (ls > self.con_thr):
-            self.turn(self.aim_boost, "right")
-        elif (ls < (-self.con_thr)):
-            self.turn(self.aim_boost, "left")
-
-    #drive forward/backwards with steering
-    def drive(self, lm, rm, direction):
-        if(direction == "forward"):
-            self.setPins(1, 0, 1, 0)
-        elif(direction == "backward"):
-            self.setPins(0, 1, 0, 1)        
-        self.setPWM(lm, rm)
-
-    #calculate based on gamepad input the steering angele / velocity difference
-    def calculateSteering(self, speed, ls):
-        self.valpwm2 = speed * (100.0 - self.min_load) + self.min_load
-        self.valpwm1 = self.valpwm2
-        self.circle_act = self.circle_thr_min + (self.circle_thr_max - self.circle_thr_min) * speed
-
-        if(ls < 0.00):
-            ls = ls * (-1)
-            self.valpwm2 = self.valpwm2 + self.circle_act * ls
-            self.valpwm1 = self.valpwm1 - self.circle_act * ls
-
-        elif(ls >= 0.00):
-            self.valpwm1 = self.valpwm1 + self.circle_act * ls
-            self.valpwm2 = self.valpwm2 - self.circle_act * ls
-
-        if(self.valpwm1 > 100.00):
-            self.valpwm2 = self.valpwm2 - (self.valpwm1 - 100.00)
-            self.valpwm1 = 100.0
-        elif(self.valpwm1 < self.min_load):
-            self.valpwm2 = self.valpwm2 + (self.min_load - self.valpwm1)
-            self.valpwm1 = self.min_load
-        elif(self.valpwm2 > 100.00):
-            self.valpwm1 = self.valpwm1 - (self.valpwm2 - 100.00)
-            self.valpwm2 = 100.0
-        elif(self.valpwm2 < self.min_load):
-            self.valpwm1 = self.valpwm1 + (self.min_load - self.valpwm2)
-            self.valpwm2 = self.min_load
+        if (right_motor <= 100.0) and (right_motor >= 0.0):
+            self.pwm2.ChangeDutyCycle(right_motor)
+        else:
+            self.pwm1.ChangeDutyCycle(0)
+            self.pwm2.ChangeDutyCycle(0)
+            raise Exception('PWM2 value out of range')
 
 
-        if(self.anlaufboost):
-            self.anlaufboost = False
-            self.valpwm1 = self.aim_boost
-            self.valpwm2 = self.aim_boost
+    def drive(self, trigger_diff, ls):
+        # calculate speed
+        self.pwm_value_left = self.max_speed * trigger_diff + (self.max_speed/5) * ls
+        self.pwm_value_right = self.max_speed * trigger_diff - (self.max_speed/5) * ls
 
-    def setSteering(self, speed, ls):
-        self.calculateSteering(speed, ls)
-        self.drive(self.valpwm1, self.valpwm2, "forward")
+        # maximaize speed
+        if(self.pwm_value_left > self.max_speed):
+            self.pwm_value_left = self.max_speed
+        elif(self.pwm_value_left < (-self.max_speed)):
+            self.pwm_value_left = -self.max_speed
+
+        if(self.pwm_value_right > self.max_speed):
+            self.pwm_value_right = self.max_speed
+        elif(self.pwm_value_right < (-self.max_speed)):
+            self.pwm_value_right = -self.max_speed
+
+        # set directions, right left has changed because driving direction changed
+        if(self.pwm_value_left >= 0):
+            GPIO.output(self.pin_motor_rechts_richtung, GPIO.LOW)
+        else:
+            GPIO.output(self.pin_motor_rechts_richtung, GPIO.HIGH)
+        if(self.pwm_value_right >= 0):
+            GPIO.output(self.pin_motor_links_richtung, GPIO.HIGH)
+        else:
+            GPIO.output(self.pin_motor_links_richtung, GPIO.LOW)
+
 
     #Control the JetBot with Gamepad-Input
     def gamepadcontroll(self, lt, rt, ls, ab, bb, xb, yb):
-        #manage state wether velocity control is activated
-        if(bb == 1):
-            self.tempomat = False
-            self.tem_val = 0
-        elif(xb == 1):
-            self.tempomat = True
+
+        trigger_diff = rt - lt
+
+        if (trigger_diff > self.con_thr) or (trigger_diff < (-self.con_thr)) or (ls > self.con_str) or (ls < (-self.con_str)):
+            self.drive(trigger_diff, ls)
+
+        else:
+            self.pwm_value_right = 0.0
+            self.pwm_value_left = 0.0
         
-        if(self.tempomat):
-            #manage velocity of velocity control
-            if(yb == 1) and (self.tem_val < 3):
-                self.tem_val = self.tem_val + 1
-            elif(ab == 1) and (self.tem_val > 0):
-                self.tem_val = self.tem_val - 1
-            print(self.tem_val)
-            #apply velocity to motors
-            #if speed is zero, allwo turn or stop
-            if(self.tem_val == 0):
-                if ((ls <= self.con_thr) or (ls>= (-self.con_thr))):
-                    self.stop()
-                else:
-                    self.turnGamepad(ls)
-            else:
-                #define speed based on velocity control for drive and calculateSteering
-                if(self.tem_val == 1):
-                    self.tem_vel = 0.0
-                elif(self.tem_val == 2):
-                    self.tem_vel = 0.5
-                elif(self.tem_val == 3):
-                    self.tem_vel = 1
-                    
-                if(rt > self.tem_vel):
-                    self.tem_vel = rt
-
-                self.calculateSteering(self.tem_vel, ls)
-                self.drive(self.valpwm1, self.valpwm2, "forward")
-            
-        elif(rt > 0.00) and (lt <= self.con_thr):
-            self.calculateSteering(rt, ls)
-            self.drive(self.valpwm1, self.valpwm2, "forward")
-            
-        elif(lt > 0.00) and (rt <= self.con_thr) and (not self.tempomat):
-            self.calculateSteering(lt, ls)
-            self.drive(self.valpwm1, self.valpwm2, "backward")
-
-        elif (rt == 0.0) and (lt == 0.0) and ((ls >= self.con_thr) or (ls <= (-self.con_thr))):
-            self.turnGamepad(ls)
-
-        elif (rt <= self.con_thr) and (lt <= self.con_thr) and ((ls <= self.con_thr) or (ls>= (-self.con_thr)) and (not self.tempomat)):
-            self.stop()
-    
-    def gamepad_controll(self, gamepad):
-        '''control motors with gamepad control and only one argument'''
-        #manage state wether velocity control is activated
-        if(gamepad.BUTTON_EAST == 1):
-            self.tempomat = False
-            self.tem_val = 0
-        elif(gamepad.BUTTON_WEST == 1):
-            self.tempomat = True
+        self.setPWM(abs(self.pwm_value_left), abs(self.pwm_value_right))
+        print('PWM_R: {:.2f} \t PWM_L: {:.2f}'.format(self.pwm_value_right ,self.pwm_value_left ))
+        time.sleep(0.1)
         
-        if(self.tempomat):
-            #manage velocity of velocity control
-            if(gamepad.BUTTON_NORTH == 1) and (self.tem_val < 3):
-                self.tem_val = self.tem_val + 1
-            elif(gamepad.BUTTON_SOUTH == 1) and (self.tem_val > 0):
-                self.tem_val = self.tem_val - 1
-            print(self.tem_val)
-            #apply velocity to motors
-            #if speed is zero, allwo turn or stop
-            if(self.tem_val == 0):
-                if ((gamepad.LEFT_JOYSTICK_HORIZONTAL <= self.con_thr) or (gamepad.LEFT_JOYSTICK_HORIZONTAL>= (-self.con_thr))):
-                    self.stop()
-                else:
-                    self.turnGamepad(gamepad.LEFT_JOYSTICK_HORIZONTAL)
-            else:
-                #define speed based on velocity control for drive and calculateSteering
-                if(self.tem_val == 1):
-                    self.tem_vel = 0.0
-                elif(self.tem_val == 2):
-                    self.tem_vel = 0.5
-                elif(self.tem_val == 3):
-                    self.tem_vel = 1
-                    
-                if(gamepad.RIGHT_TRIGGER > self.tem_vel):
-                    self.tem_vel = gamepad.RIGHT_TRIGGER
 
-                self.calculateSteering(self.tem_vel, gamepad.LEFT_JOYSTICK_HORIZONTAL)
-                self.drive(self.valpwm1, self.valpwm2, "forward")
             
-        elif(gamepad.RIGHT_TRIGGER > 0.00) and (gamepad.LEFT_TRIGGER <= self.con_thr):
-            self.calculateSteering(gamepad.RIGHT_TRIGGER, gamepad.LEFT_JOYSTICK_HORIZONTAL)
-            self.drive(self.valpwm1, self.valpwm2, "forward")
-            
-        elif(gamepad.LEFT_TRIGGER > 0.00) and (gamepad.RIGHT_TRIGGER <= self.con_thr) and (not self.tempomat):
-            self.calculateSteering(gamepad.LEFT_TRIGGER, gamepad.LEFT_JOYSTICK_HORIZONTAL)
-            self.drive(self.valpwm1, self.valpwm2, "backward")
-
-        elif (gamepad.RIGHT_TRIGGER == 0.0) and (gamepad.LEFT_TRIGGER == 0.0) and ((gamepad.LEFT_JOYSTICK_HORIZONTAL >= self.con_thr) or (gamepad.LEFT_JOYSTICK_HORIZONTAL <= (-self.con_thr))):
-            self.turnGamepad(gamepad.LEFT_JOYSTICK_HORIZONTAL)
-
-        elif (gamepad.RIGHT_TRIGGER <= self.con_thr) and (gamepad.LEFT_TRIGGER <= self.con_thr) and ((gamepad.LEFT_JOYSTICK_HORIZONTAL <= self.con_thr) or (gamepad.LEFT_JOYSTICK_HORIZONTAL>= (-self.con_thr)) and (not self.tempomat)):
-            self.stop()
