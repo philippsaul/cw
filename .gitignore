@@ -2,3 +2,6 @@ src/facedetection/__pycache__
 src/linedetection/__pycache__
 src/steering/__pycache__
 src/webstream/__pycache__
+src/motor/__pycache__
+src/controller/__pycache__
+src/video/__pycache__
