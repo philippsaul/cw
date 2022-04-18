@@ -5,3 +5,5 @@ src/webstream/__pycache__
 src/motor/__pycache__
 src/controller/__pycache__
 src/video/__pycache__
+src/driving/__pycache__
+src/__pycache__
