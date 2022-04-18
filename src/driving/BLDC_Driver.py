@@ -183,7 +183,7 @@ class BLDC():
 
     def set_motor0_phase(self, throttle: float) -> float:
         rotation = self.myAS5600.get_rotation_degree(0)
-        self.phase_motor0, torque = self.__calc_phase_torque(throttle, self.phase_motor0, rotation)
+        self.phase_motor0, torque = self.__calc_phase_torque(-throttle, self.phase_motor0, rotation)
 
         self.myPCA9685.set_pwm(self.channel_motor0_input1, torque * self.sin[self.phase_motor0])
         self.myPCA9685.set_pwm(self.channel_motor0_input2, torque * self.sin[(self.phase_motor0 + 120) % 360])
@@ -193,7 +193,7 @@ class BLDC():
 
     def set_motor1_phase(self, throttle: float) -> float:
         rotation = self.myAS5600.get_rotation_degree(1)
-        self.phase_motor1, torque = self.__calc_phase_torque(-throttle, self.phase_motor1, rotation)
+        self.phase_motor1, torque = self.__calc_phase_torque(throttle, self.phase_motor1, rotation)
 
         self.myPCA9685.set_pwm(self.channel_motor1_input1, torque * self.sin[self.phase_motor1])
         self.myPCA9685.set_pwm(self.channel_motor1_input2, torque * self.sin[(self.phase_motor1 + 120) % 360])
