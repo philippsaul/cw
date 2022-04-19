@@ -16,7 +16,7 @@ class BLDC():
 
         self.output_enable_pin = 7
         # range 24 to 1526 Hz
-        self.pwm_frequency = 1000
+        self.pwm_frequency = 1200
         
         self.channel_motor0_input1 = 0
         self.channel_motor0_input2 = 1
