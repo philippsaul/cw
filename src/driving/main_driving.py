@@ -2,12 +2,16 @@
 import time
 
 from driving.BLDC_Driver import BLDC
+from settings_read import read_settings
 
 class Drivetrain():
-    def __init__(self) -> None:
+    def __init__(self, log, gpio, output_enable_pin) -> None:
+        self.driving_direction = float(read_settings('driving_direction'))
 
-        self.myBLDC = BLDC()
+        self.myBLDC = BLDC(log, gpio, output_enable_pin)
+        self.myBLDC.set_max_torque(float(read_settings('max_torque')))
         self.myBLDC.startup()
+
 
     def __del__(self) -> None:
         self.myBLDC.set_motor_sleep()
@@ -27,8 +31,8 @@ class Drivetrain():
         motor0_speed = max(min(motor0_speed,1),-1)
         motor1_speed = max(min(motor1_speed,1),-1)
 
-        # self.myBLDC.set_motor0_phase(-motor0_speed, self.myBLDC.get_rotation(0))
-        self.myBLDC.set_motor1_phase(motor1_speed, self.myBLDC.get_rotation(1))
+        self.myBLDC.set_motor0_phase(motor0_speed * -self.driving_direction, self.myBLDC.get_rotation(0))
+        self.myBLDC.set_motor1_phase(motor1_speed * self.driving_direction, self.myBLDC.get_rotation(1))
         # print('{:2.1f} | {:2.1f} | {:2.1f}'.format(motor0_speed, motor1_speed, d_const), end='              \r') # debugging
 
 
