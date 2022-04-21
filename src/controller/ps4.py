@@ -12,158 +12,158 @@ class Actions:
     In order to bind to the controller events, subclass the Controller class and
     override desired action events in this class.
     """
-    def __init__(self):
-        return
+    def __init__(self, log):
+        self.log = log
 
     def on_x_press(self):
-        print("on_x_press")
+        self.log.info("on_x_press")
 
     def on_x_release(self):
-        print("on_x_release")
+        self.log.info("on_x_release")
 
     def on_triangle_press(self):
-        print("on_triangle_press")
+        self.log.info("on_triangle_press")
 
     def on_triangle_release(self):
-        print("on_triangle_release")
+        self.log.info("on_triangle_release")
 
     def on_circle_press(self):
-        print("on_circle_press")
+        self.log.info("on_circle_press")
 
     def on_circle_release(self):
-        print("on_circle_release")
+        self.log.info("on_circle_release")
 
     def on_square_press(self):
-        print("on_square_press")
+        self.log.info("on_square_press")
 
     def on_square_release(self):
-        print("on_square_release")
+        self.log.info("on_square_release")
 
     def on_L1_press(self):
-        print("on_L1_press")
+        self.log.info("on_L1_press")
 
     def on_L1_release(self):
-        print("on_L1_release")
+        self.log.info("on_L1_release")
 
     def on_L2_press(self, value):
-        print("on_L2_press: {}".format(value))
+        self.log.info("on_L2_press: {}".format(value))
 
     def on_L2_release(self):
-        print("on_L2_release")
+        self.log.info("on_L2_release")
 
     def on_R1_press(self):
-        print("on_R1_press")
+        self.log.info("on_R1_press")
 
     def on_R1_release(self):
-        print("on_R1_release")
+        self.log.info("on_R1_release")
 
     def on_R2_press(self, value):
-        print("on_R2_press: {}".format(value))
+        self.log.info("on_R2_press: {}".format(value))
 
     def on_R2_release(self):
-        print("on_R2_release")
+        self.log.info("on_R2_release")
 
     def on_up_arrow_press(self):
-        print("on_up_arrow_press")
+        self.log.info("on_up_arrow_press")
 
     def on_up_down_arrow_release(self):
-        print("on_up_down_arrow_release")
+        self.log.info("on_up_down_arrow_release")
 
     def on_down_arrow_press(self):
-        print("on_down_arrow_press")
+        self.log.info("on_down_arrow_press")
 
     def on_left_arrow_press(self):
-        print("on_left_arrow_press")
+        self.log.info("on_left_arrow_press")
 
     def on_left_right_arrow_release(self):
-        print("on_left_right_arrow_release")
+        self.log.info("on_left_right_arrow_release")
 
     def on_right_arrow_press(self):
-        print("on_right_arrow_press")
+        self.log.info("on_right_arrow_press")
 
     def on_L3_up(self, value):
-        print("on_L3_up: {}".format(value))
+        self.log.info("on_L3_up: {}".format(value))
 
     def on_L3_down(self, value):
-        print("on_L3_down: {}".format(value))
+        self.log.info("on_L3_down: {}".format(value))
 
     def on_L3_left(self, value):
-        print("on_L3_left: {}".format(value))
+        self.log.info("on_L3_left: {}".format(value))
 
     def on_L3_right(self, value):
-        print("on_L3_right: {}".format(value))
+        self.log.info("on_L3_right: {}".format(value))
 
     def on_L3_y_at_rest(self):
         """L3 joystick is at rest after the joystick was moved and let go off"""
-        print("on_L3_y_at_rest")
+        self.log.info("on_L3_y_at_rest")
 
     def on_L3_x_at_rest(self):
         """L3 joystick is at rest after the joystick was moved and let go off"""
-        print("on_L3_x_at_rest")
+        self.log.info("on_L3_x_at_rest")
 
     def on_L3_press(self):
         """L3 joystick is clicked. This event is only detected when connecting without ds4drv"""
-        print("on_L3_press")
+        self.log.info("on_L3_press")
 
     def on_L3_release(self):
         """L3 joystick is released after the click. This event is only detected when connecting without ds4drv"""
-        print("on_L3_release")
+        self.log.info("on_L3_release")
 
     def on_R3_up(self, value):
-        print("on_R3_up: {}".format(value))
+        self.log.info("on_R3_up: {}".format(value))
 
     def on_R3_down(self, value):
-        print("on_R3_down: {}".format(value))
+        self.log.info("on_R3_down: {}".format(value))
 
     def on_R3_left(self, value):
-        print("on_R3_left: {}".format(value))
+        self.log.info("on_R3_left: {}".format(value))
 
     def on_R3_right(self, value):
-        print("on_R3_right: {}".format(value))
+        self.log.info("on_R3_right: {}".format(value))
 
     def on_R3_y_at_rest(self):
         """R3 joystick is at rest after the joystick was moved and let go off"""
-        print("on_R3_y_at_rest")
+        self.log.info("on_R3_y_at_rest")
 
     def on_R3_x_at_rest(self):
         """R3 joystick is at rest after the joystick was moved and let go off"""
-        print("on_R3_x_at_rest")
+        self.log.info("on_R3_x_at_rest")
 
     def on_R3_press(self):
         """R3 joystick is clicked. This event is only detected when connecting without ds4drv"""
-        print("on_R3_press")
+        self.log.info("on_R3_press")
 
     def on_R3_release(self):
         """R3 joystick is released after the click. This event is only detected when connecting without ds4drv"""
-        print("on_R3_release")
+        self.log.info("on_R3_release")
 
     def on_options_press(self):
-        print("on_options_press")
+        self.log.info("on_options_press")
 
     def on_options_release(self):
-        print("on_options_release")
+        self.log.info("on_options_release")
 
     def on_share_press(self):
         """this event is only detected when connecting without ds4drv"""
-        print("on_share_press")
+        self.log.info("on_share_press")
 
     def on_share_release(self):
         """this event is only detected when connecting without ds4drv"""
-        print("on_share_release")
+        self.log.info("on_share_release")
 
     def on_playstation_button_press(self):
         """this event is only detected when connecting without ds4drv"""
-        print("on_playstation_button_press")
+        self.log.info("on_playstation_button_press")
 
     def on_playstation_button_release(self):
         """this event is only detected when connecting without ds4drv"""
-        print("on_playstation_button_release")
+        self.log.info("on_playstation_button_release")
 
 
 class Controller(Actions):
 
     def __init__(
-            self, interface, connecting_using_ds4drv=True,
+            self, log, interface, connecting_using_ds4drv=True,
             event_definition=None, event_format=None
                 ):
         """
@@ -175,7 +175,8 @@ class Controller(Actions):
                                                  bluetooth/bluetoothctl, set it to False otherwise the controller
                                                  button mapping will be off.
         """
-        Actions.__init__(self)
+        self.log = log
+        Actions.__init__(self, log = self.log)
         self.stop = False
         self.is_connected = False
         self.interface = interface
@@ -210,7 +211,13 @@ class Controller(Actions):
         self.ab = 0
         self.xb = 0
 
-    def listen(self, timeout=120, on_connect=None, on_disconnect=None, on_sequence=None):
+        self.lb = 0
+        
+        self.trackpad = 0
+
+    def listen(self, timeout=5, on_connect=None, on_disconnect=None, on_sequence=None):
+        if self.log.error:
+            return
         """
         Start listening for events on a given self.interface
         :param timeout: INT, seconds. How long you want to wait for the self.interface.
@@ -224,6 +231,7 @@ class Controller(Actions):
                                   "callback": () -> None)}]
         :return: None
         """
+
         def on_disconnect_callback():
             self.is_connected = False
             if on_disconnect is not None:
@@ -235,21 +243,22 @@ class Controller(Actions):
                 on_connect()
 
         def wait_for_interface():
-            print("Waiting for interface: {} to become available . . .".format(self.interface))
+            # self.log.info("Waiting for interface: {} to become available . . .".format(self.interface))
             for i in range(timeout):
                 if os.path.exists(self.interface):
-                    print("Successfully bound to: {}.".format(self.interface))
+                    # self.log.info("Successfully bound to: {}.".format(self.interface))
                     on_connect_callback()
                     return
                 time.sleep(1)
-            print("Timeout({} sec). Interface not available.".format(timeout))
+            self.log.error("Timeout({} sec). Interface not available.".format(timeout))
             exit(1)
 
         def read_events():
             try:
                 return _file.read(self.event_size)
             except IOError:
-                print("Interface lost. Device disconnected?")
+                
+                self.log.warning("Interface lost. Device disconnected?")
                 on_disconnect_callback()
                 exit(1)
 
@@ -260,7 +269,7 @@ class Controller(Actions):
         def unpack():
             __event = struct.unpack(self.event_format, event)
             # uncomment to see which pins are in use
-            # print(str(__event[3]) + ' '+str( __event[4])  + ' '+ str(__event[5]))
+            # self.log.info(str(__event[3]) + ' '+str( __event[4])  + ' '+ str(__event[5]))
             if __event[4] == 2 and __event[5] == 0:
                 self.ls = __event[3]
             elif __event[4] == 2 and __event[5] == 4:
@@ -275,6 +284,10 @@ class Controller(Actions):
                 self.ab = __event[3]
             elif __event[4] == 1 and __event[5] == 0:
                 self.xb = __event[3]
+            elif __event[4] == 1 and __event[5] == 4:
+                self.lb = __event[3]
+            elif __event[4] == 1 and __event[5] == 13:
+                self.trackpad = __event[3]
             return (__event[3:], __event[2], __event[1], __event[0])
 
         wait_for_interface()
@@ -296,7 +309,7 @@ class Controller(Actions):
                         special_input["callback"]()
                 event = read_events()
         except KeyboardInterrupt:
-            print("\nExiting (Ctrl + C)")
+            self.log.error("\nExiting (Ctrl + C)")
             on_disconnect_callback()
             exit(1)
 

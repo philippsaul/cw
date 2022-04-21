@@ -1,4 +1,6 @@
 
+import time
+
 PCA9544_ADDRESS     = 0x77
 PCA9544_CHANNEL_0   = 0x05
 PCA9544_CHANNEL_1   = 0x04
@@ -14,9 +16,16 @@ ANGLE_L             = 0x0F
 
 class AS5600():
     def __init__(self, bus) -> None:
-            """Initialize the AS5600."""
-            self._bus = bus
-            self.current_selected_as5600 = None
+        """Initialize the AS5600."""
+        self._bus = bus
+        self.current_selected_as5600 = None
+        
+        self.max_average = 1000
+
+        self.buffer_rotation = [[1 for i in range(self.max_average)], [1 for i in range(self.max_average)]]
+        self.buffer_speed = [[1 for i in range(self.max_average)], [1 for i in range(self.max_average)]]
+        self.buffer_time = [[time.time() for i in range(self.max_average)], [time.time() for i in range(self.max_average)]]
+        self.buffer_d_phi = [[1 for i in range(self.max_average)], [1 for i in range(self.max_average)]]
 
 
     def select_AS5600(self, channel: int):
@@ -43,6 +52,31 @@ class AS5600():
         angle_l = self._bus.read_byte_data(AS5600_ADDRESS, ANGLE_L)
         return (360*(angle_l + (angle_h << 8))/4095)%360
 
+    def update_rotation(self, chip: int) -> list:
+        """Update the data-log for rotation position"""
+        self.buffer_rotation[chip].pop(0)
+        self.buffer_rotation[chip].append(self.get_rotation_degree(chip))
+
+        self.buffer_time[chip].pop(0)
+        self.buffer_time[chip].append(time.time())
+
+        self.d_phi = self.buffer_rotation[chip][-1] - self.buffer_rotation[chip][-2]
+        if self.d_phi > 180:
+            self.d_phi -= 360
+        elif self.d_phi < -180:
+            self.d_phi += 360
+        
+        if chip == 0:
+            self.d_phi *= -1
+
+        self.buffer_d_phi[chip].pop(0)
+        self.buffer_d_phi[chip].append(self.d_phi)
+
+        self.buffer_speed[chip].pop(0)
+        self.buffer_speed[chip].append(self.d_phi / (self.buffer_time[chip][-1] - self.buffer_time[chip][-2]))
+
+        return self.buffer_rotation[chip]
+    
     def get_zero_position(self, chip: int) -> int:
         """Returns the Zero-Position."""
         self.select_AS5600(chip)
@@ -77,12 +111,21 @@ class AS5600():
             status = 'Warning'
         return status, message
 
+    def avg_speed(self, chip: int) -> float:
+        """Returns the average rotating speed of the ma"""
+        return (sum(self.buffer_speed[chip]) / len(self.buffer_speed[chip]))
+
+    def rotation_difference(self) -> set:
+        """return the difference in rotation over the max_average steps"""
+        return (sum(self.buffer_d_phi[0]), sum(self.buffer_d_phi[1]), sum(self.buffer_d_phi[0]) - sum(self.buffer_d_phi[1]))
+
+
 
 # import time
 # import smbus
 # x = AS5600(smbus.SMBus(bus = 0))
 # while True:
-#     print(round(x.get_rotation_degree(0),2), end='\r')
+#     print(round(x.get_rotation_degree(1),2), end='\r')
 #     time.sleep(0.05)
 
 

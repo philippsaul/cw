@@ -58,7 +58,7 @@ class PCA9685():
 
     def set_pwm(self, channel: int, duty_cycle: float) -> None:
         """Sets pwm values. duty_cycle range 0-1 in float. Use predefined channels only."""
-        on = int(4095 - 4095 * duty_cycle)
+        on = int(round(4095 - 4095 * duty_cycle, 0))
         off = 4095
         self._bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_L+4*channel, on & 0xFF)
         self._bus.write_byte_data(PCA9685_ADDRESS, LED0_ON_H+4*channel, on >> 8)

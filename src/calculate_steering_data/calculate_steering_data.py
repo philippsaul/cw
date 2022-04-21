@@ -6,8 +6,9 @@ from settings_read import read_settings
 
 # funktion soll anhand der eingangsparameter entscheiden welche steuerungsdaten zurückgegeben werden
 class Calculate_steering_data:
-    def __init__(self, gamepad) -> None:
+    def __init__(self, log, gamepad) -> None:
         self.gamepad = gamepad
+        self.log = log
 
         # auslesen der values von der settings.ini datei
         self.deadzone_thr = float(read_settings('deadzone_throttle'))
