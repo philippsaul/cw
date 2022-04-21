@@ -46,7 +46,7 @@ class BLDC():
         self.myPCA9685.set_pwm_freq(self.pwm_frequency)
 
         self.sin = driving.sin.sin
-        self.steps = 25
+        self.steps = 10
         self.polpair = 7
         self.degrees_per_polpair = 360.0/self.polpair
         self.degrees_per_step = self.degrees_per_polpair/256.0
