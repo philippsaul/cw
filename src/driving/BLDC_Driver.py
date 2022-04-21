@@ -47,7 +47,7 @@ class BLDC():
         GPIO.setup(self.output_enable_pin, GPIO.OUT, initial = GPIO.HIGH) # disables output
 
         self.sin = driving.sin.sin
-        self.steps = 25
+        self.steps = 1
         self.polpair = 7
         self.degrees_per_polpair = 360.0/self.polpair
         self.degrees_per_step = self.degrees_per_polpair/360.0
@@ -168,6 +168,7 @@ class BLDC():
             x = abs(rotation_difference / (self.degrees_per_polpair/4))
             torque = (1 + (x-1)**3) * self.max_torque
             # torque = (1 - (1-x**2)**4) * self.max_torque # alternative to previos liine
+            # torque = 0.4
             if torque < 0.1 and throttle == 0:
                 torque = 0
             elif torque > self.max_torque:
@@ -182,9 +183,10 @@ class BLDC():
         return int(round(new_phase, 0))%360, round(torque, 2)
 
     def set_motor0_phase(self, throttle: float) -> float:
-        rotation = self.myAS5600.get_rotation_degree(0)
+        rotation = self.myAS5600.update_rotation(0)[-1]
         self.phase_motor0, torque = self.__calc_phase_torque(-throttle, self.phase_motor0, rotation)
-
+        # self.phase_motor0 = (self.phase_motor0 + 1)%360
+        # torque = 0.5
         self.myPCA9685.set_pwm(self.channel_motor0_input1, torque * self.sin[self.phase_motor0])
         self.myPCA9685.set_pwm(self.channel_motor0_input2, torque * self.sin[(self.phase_motor0 + 120) % 360])
         self.myPCA9685.set_pwm(self.channel_motor0_input3, torque * self.sin[(self.phase_motor0 + 240) % 360])
@@ -192,7 +194,7 @@ class BLDC():
         return rotation
 
     def set_motor1_phase(self, throttle: float) -> float:
-        rotation = self.myAS5600.get_rotation_degree(1)
+        rotation = self.myAS5600.update_rotation(1)[-1]
         self.phase_motor1, torque = self.__calc_phase_torque(throttle, self.phase_motor1, rotation)
 
         self.myPCA9685.set_pwm(self.channel_motor1_input1, torque * self.sin[self.phase_motor1])

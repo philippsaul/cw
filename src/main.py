@@ -35,9 +35,18 @@ while True:
 
 
           myGamepad.get_data()
+          # print(myGamepad.xb)
           # mySafety.safety() # empty
           steering_data = myCalcSteering.calc()
+          # if myGamepad.xb:
+          #      steering_data = (1, 0)
+          # else:
+          #      steering_data = (0, 0)
+          steering_data = (1, 0)
+          time.sleep(0.0001)
           myDrivetrain.drive(steering_data)
+          # print(myDrivetrain.myBLDC.myAS5600.avg_speed(0), end='              \r')
+          # print('{:2.1f} | {:2.1f} | {:2.1f}'.format(myDrivetrain.myBLDC.myAS5600.rotation_difference()[0], myDrivetrain.myBLDC.myAS5600.rotation_difference()[1], myDrivetrain.myBLDC.myAS5600.rotation_difference()[2]), end='              \r') # debugging
      except Exception as e:
           log.error(e)
           raise Exception(e)
