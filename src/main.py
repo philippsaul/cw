@@ -19,7 +19,7 @@ myMopets = Motors() # old brushed motors
 mySafety = Safety(gamepad = myGamepad)
 myCalcSteering = Calculate_steering_data(gamepad = myGamepad)
 
-mySafety.enable_gamepad()
+# mySafety.enable_gamepad()
 
 #start stram in background
 # stream_thread = threading.Thread(target=web_streaming.start)
@@ -42,8 +42,8 @@ while True:
           #      steering_data = (1, 0)
           # else:
           #      steering_data = (0, 0)
-          steering_data = (1, 0)
-          time.sleep(0.0001)
+          steering_data = (0, 0)
+          time.sleep(0.01)
           myDrivetrain.drive(steering_data)
           # print(myDrivetrain.myBLDC.myAS5600.avg_speed(0), end='              \r')
           # print('{:2.1f} | {:2.1f} | {:2.1f}'.format(myDrivetrain.myBLDC.myAS5600.rotation_difference()[0], myDrivetrain.myBLDC.myAS5600.rotation_difference()[1], myDrivetrain.myBLDC.myAS5600.rotation_difference()[2]), end='              \r') # debugging

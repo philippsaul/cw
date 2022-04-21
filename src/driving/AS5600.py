@@ -115,7 +115,7 @@ class AS5600():
         """Returns the average rotating speed of the ma"""
         return (sum(self.buffer_speed[chip]) / len(self.buffer_speed[chip]))
 
-    def rotation_difference(self) -> float:
+    def rotation_difference(self) -> set:
         """return the difference in rotation over the max_average steps"""
         return (sum(self.buffer_d_phi[0]), sum(self.buffer_d_phi[1]), sum(self.buffer_d_phi[0]) - sum(self.buffer_d_phi[1]))
 
