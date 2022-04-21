@@ -25,12 +25,17 @@ mylog.info('STARTING!')
 # myCam = Camera()
 myGamepad = Gamepad(log = mylog)
 myDrivetrain = Drivetrain(log = mylog, gpio = GPIO, output_enable_pin = motor_output_enable_pin)
+myDrivetrain.start()
 mySafety = Safety(log = mylog, gamepad = myGamepad)
 myCalcSteering = Calculate_steering_data(log = mylog, gamepad = myGamepad)
 
-# start stram in background
-stream_thread = threading.Thread(target=web_streaming.start)
-stream_thread.start()
+# # start stream in background
+# stream_thread = threading.Thread(target=web_streaming.start)
+# stream_thread.start()
+
+# start test in background
+# test_thread = threading.Thread(target=Drivetrain.test, args=(myDrivetrain, ))
+# test_thread.start()
 
 
 try:
@@ -43,7 +48,9 @@ try:
           myGamepad.get_data()
           mySafety.safety()
           steering_data = myCalcSteering.calc()
-          myDrivetrain.drive(steering_data)
+          myDrivetrain.update_steering_data(steering_data)
+          print("main")
+          time.sleep(1)
 
           # print(myDrivetrain.myBLDC.myAS5600.avg_speed(0), end='              \r')
           # print('{:2.1f} | {:2.1f} | {:2.1f}'.format(myDrivetrain.myBLDC.myAS5600.rotation_difference()[0], myDrivetrain.myBLDC.myAS5600.rotation_difference()[1], myDrivetrain.myBLDC.myAS5600.rotation_difference()[2]), end='              \r') # debugging
