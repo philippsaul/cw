@@ -7,12 +7,13 @@ import Jetson.GPIO as GPIO
 from calculate_steering_data.calculate_steering_data import \
     Calculate_steering_data
 from controller.gamepad import Gamepad
+from driving.BLDC_Driver import BLDC
 from driving.main_driving import Drivetrain
 from log import log
 from safety.safety import Safety
 from video import web_streaming
 from video.camera import Camera
-from video import web_streaming
+
 
 motor_output_enable_pin = 7
 GPIO.setmode(GPIO.BOARD)
@@ -24,13 +25,14 @@ mylog = log()
 mylog.info('STARTING!')
 # myCam = Camera()
 myGamepad = Gamepad(log = mylog)
-myDrivetrain = Drivetrain(log = mylog, gpio = GPIO, output_enable_pin = motor_output_enable_pin)
+myBLDC = BLDC(log = mylog, gpio = GPIO, output_enable_pin = motor_output_enable_pin)
+myDrivetrain = Drivetrain(log = mylog, BLDC = myBLDC)
 mySafety = Safety(log = mylog, gamepad = myGamepad)
 myCalcSteering = Calculate_steering_data(log = mylog, gamepad = myGamepad)
 
 # start stram in background
-stream_thread = threading.Thread(target=web_streaming.start)
-stream_thread.start()
+# stream_thread = threading.Thread(target=web_streaming.start)
+# stream_thread.start()
 
 
 try:
@@ -51,6 +53,7 @@ try:
 
 # 'except Exception as e:' does not stop the motors
 except:
-     myDrivetrain.__del__()
+     myDrivetrain.cleanup()
+     myBLDC.cleanup()
      GPIO.cleanup()
      mylog.warning('STOPPED!')

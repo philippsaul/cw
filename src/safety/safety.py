@@ -32,7 +32,7 @@ class Safety():
     def safety(self) -> None:
         # manueller Stop über trackpad eines ps4 controllers
         if self.gamepad.trackpad:
-            self.log.warning('Safety: Button pressed on Gamepad.')
+            self.log.warning('Safety: STOP-Button pressed on Gamepad.')
             self.log.raise_Error()
 
         # Abschaltung wenn die Verbindung zum Controller abbricht

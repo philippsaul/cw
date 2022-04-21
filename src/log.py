@@ -19,3 +19,4 @@ class log:
         
     def raise_Error(self):
         self.error = True
+        raise Exception()

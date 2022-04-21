@@ -1,21 +1,20 @@
 
-import time
 
-from driving.BLDC_Driver import BLDC
 from settings_read import read_settings
 
 class Drivetrain():
-    def __init__(self, log, gpio, output_enable_pin) -> None:
+    def __init__(self, log, BLDC) -> None:
+        self.myBLDC = BLDC
         self.driving_direction = float(read_settings('driving_direction'))
-
-        self.myBLDC = BLDC(log, gpio, output_enable_pin)
         self.myBLDC.set_max_torque(float(read_settings('max_torque')))
         self.myBLDC.startup()
 
 
     def __del__(self) -> None:
-        self.myBLDC.set_motor_sleep()
-        self.myBLDC.pca9685_output_enable(state=False)
+        pass
+
+    def cleanup(self) -> None:
+        pass
 
 
     def drive(self, steering_data: list) -> None:
