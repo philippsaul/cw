@@ -20,7 +20,7 @@ class AS5600():
         self._bus = bus
         self.current_selected_as5600 = None
         
-        self.max_average = 10000
+        self.max_average = 1000
 
         self.buffer_rotation = [[1 for i in range(self.max_average)], [1 for i in range(self.max_average)]]
         self.buffer_speed = [[1 for i in range(self.max_average)], [1 for i in range(self.max_average)]]

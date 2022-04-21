@@ -31,20 +31,24 @@ class Drivetrain(Thread):
 
     def cleanup(self) -> None:
         self.myBLDC.cleanup()
-        pass
+
 
 
     def update_steering_data(self, steering_data: list) -> None:
         self.steering_data = steering_data
-        
 
-    def drive(self, steering_data: list) -> None:
-        throttle, steering = steering_data
+    def drive(self) -> None:
+        throttle, steering = self.steering_data
         act_rotation_0_sum, act_rotation_1_sum, difference = self.myBLDC.myAS5600.rotation_difference()
-        if act_rotation_0_sum + act_rotation_1_sum > 0.1:
-            d_const = 0.5*difference / (0.5*(act_rotation_0_sum + act_rotation_1_sum))
-        else:
-            d_const = 0
+
+
+        self.rot_fac = self.pid.send([self.myBLDC.myAS5600.buffer_time[-1], difference])
+
+
+        # if act_rotation_0_sum + act_rotation_1_sum > 0.1:
+        #     d_const = 0.5*difference / (0.5*(act_rotation_0_sum + act_rotation_1_sum))
+        # else:
+        #     d_const = 0
         motor0_speed = throttle*abs(throttle) - steering*abs(steering) - d_const
         motor1_speed = throttle*abs(throttle) + steering*abs(steering) + d_const
 
@@ -60,7 +64,7 @@ class Drivetrain(Thread):
         while not self.gamepad.enable_gamepad:
             time.sleep(0.1)
         while True:
-            self.drive(self.steering_data)
+            self.drive()
             time.sleep(0.0001)
         # pass
               

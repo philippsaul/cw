@@ -46,8 +46,7 @@ try:
           mySafety.safety()
           steering_data = myCalcSteering.calc()
           myDrivetrain.update_steering_data(steering_data)
-          print("main")
-          time.sleep(1)
+
 
           # print(myDrivetrain.myBLDC.myAS5600.avg_speed(0), end='              \r')
           # print('{:2.1f} | {:2.1f} | {:2.1f}'.format(myDrivetrain.myBLDC.myAS5600.rotation_difference()[0], myDrivetrain.myBLDC.myAS5600.rotation_difference()[1], myDrivetrain.myBLDC.myAS5600.rotation_difference()[2]), end='              \r') # debugging
