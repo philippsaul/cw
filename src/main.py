@@ -12,6 +12,7 @@ from log import log
 from safety.safety import Safety
 from video import web_streaming
 from video.camera import Camera
+from video import web_streaming
 
 motor_output_enable_pin = 7
 GPIO.setmode(GPIO.BOARD)
@@ -27,9 +28,9 @@ myDrivetrain = Drivetrain(log = mylog, gpio = GPIO, output_enable_pin = motor_ou
 mySafety = Safety(log = mylog, gamepad = myGamepad)
 myCalcSteering = Calculate_steering_data(log = mylog, gamepad = myGamepad)
 
-#start stram in background
-# stream_thread = threading.Thread(target=web_streaming.start)
-# stream_thread.start()
+# start stram in background
+stream_thread = threading.Thread(target=web_streaming.start)
+stream_thread.start()
 
 
 try:
