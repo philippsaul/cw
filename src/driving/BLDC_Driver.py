@@ -10,10 +10,12 @@ from driving.PCA9685 import PCA9685
 
 
 class BLDC():
-    def __init__(self, log,  gpio, output_enable_pin) -> None:
+    def __init__(self, log,  gpio, output_enable_pin, debugging = False) -> None:
         """Initialize the Driver."""
         self.log = log
         self.GPIO = gpio
+
+        self.debugging = debugging
 
         self.output_enable_pin = output_enable_pin
         # range 24 to 1526 Hz
@@ -44,7 +46,7 @@ class BLDC():
         self.myPCA9685.set_pwm_freq(self.pwm_frequency)
 
         self.sin = driving.sin.sin
-        self.steps = 25
+        self.steps = 10
         self.polpair = 7
         self.degrees_per_polpair = 360.0/self.polpair
         self.degrees_per_step = self.degrees_per_polpair/256.0
@@ -52,6 +54,13 @@ class BLDC():
         self.phase_motor0 = 0
         self.phase_motor1 = 0
         self.max_torque = 0
+
+    def __del__(self):
+        pass
+
+    def cleanup(self) -> None:
+        self.set_motor_sleep()
+        self.pca9685_output_enable(state=False)
 
 
 
@@ -111,8 +120,6 @@ class BLDC():
             self.myPCA9685.set_pwm(self.channel_motor0_input1, 0)
             self.myPCA9685.set_pwm(self.channel_motor0_input2, 0)
             self.myPCA9685.set_pwm(self.channel_motor0_input3, 0)
-            # print(self.myAS5600.get_rotation_degree(0)) # debugging
-            # print((self.myAS5600.get_zero_position(0)/4095)*359) # debugging
         elif motor == 1:
             self.myPCA9685.set_pwm(self.channel_motor1_input1, self.max_torque * (math.sin((self.phase_motor1/256)*2*3.14159)+1)/2)
             self.myPCA9685.set_pwm(self.channel_motor1_input2, self.max_torque * (math.sin(((self.phase_motor1/256)+(120/360))*2*3.14159)+1)/2)
@@ -144,8 +151,9 @@ class BLDC():
         self.enable_all_channels()
         self.set_motor_reset(state=False)
         self.set_motor_sleep(state=False)
-        self.check_magnet_strength(0)
-        self.check_magnet_strength(1)
+        if self.debugging:
+            self.check_magnet_strength(0)
+            self.check_magnet_strength(1)
         self.init_rotation(0)
         self.init_rotation(1)
 
