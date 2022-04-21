@@ -17,7 +17,7 @@ class BLDC():
 
         self.output_enable_pin = 7
         # range 24 to 1526 Hz
-        self.pwm_frequency = 1526
+        self.pwm_frequency = 750
         
         self.channel_motor0_input1 = 0
         self.channel_motor0_input2 = 1
@@ -55,7 +55,7 @@ class BLDC():
 
         self.phase_motor0 = 0
         self.phase_motor1 = 0
-        self.max_torque = 1
+        self.max_torque = 0.4
 
 
 
@@ -119,10 +119,10 @@ class BLDC():
             # print((self.myAS5600.get_zero_position(0)/4095)*359) # debugging
         elif motor == 1:
             self.myPCA9685.set_pwm(self.channel_motor1_input1, self.max_torque * math.sin((self.phase_motor1/256)*2*3.14159))
-            self.myPCA9685.set_pwm(self.channel_motor1_input2, self.max_torque * math.sin((self.phase_motor1/256)*2*3.14159 +120))
-            self.myPCA9685.set_pwm(self.channel_motor1_input3, self.max_torque * math.sin((self.phase_motor1/256)*2*3.14159 +240))
+            self.myPCA9685.set_pwm(self.channel_motor1_input2, self.max_torque * math.sin(((self.phase_motor1/256)+(120/360))*2*3.14159))
+            self.myPCA9685.set_pwm(self.channel_motor1_input3, self.max_torque * math.sin(((self.phase_motor1/256)+(240/360))*2*3.14159))
             time.sleep(0.9)
-            self.myAS5600.set_zero_position(1, (self.myAS5600.get_zero_position(1)/4095)*360 + self.myAS5600.get_rotation_degree(1))
+            self.myAS5600.set_zero_position(1, (self.myAS5600.get_zero_position(1)/4096)*360 + self.myAS5600.get_rotation_degree(1))
             time.sleep(0.1)
             self.myPCA9685.set_pwm(self.channel_motor1_input1, 0)
             self.myPCA9685.set_pwm(self.channel_motor1_input2, 0)
@@ -159,28 +159,28 @@ class BLDC():
         new_phase = (old_phase + phase_increment) % 256
         actual_rotation %= self.degrees_per_polpair
 
-        rotation_difference = actual_rotation - (new_phase / self.polpair)
+        rotation_difference = actual_rotation - new_phase/256 * self.degrees_per_polpair
         if rotation_difference < -(self.degrees_per_polpair/2):
             rotation_difference += self.degrees_per_polpair
         elif rotation_difference > (self.degrees_per_polpair/2):
             rotation_difference -= self.degrees_per_polpair
             
-        if abs(rotation_difference) <= self.degrees_per_polpair/4:
-            x = abs(rotation_difference / (self.degrees_per_polpair/4))
-            torque = (1 + (x-1)**3) * self.max_torque
-            # torque = (1 - (1-x**2)**4) * self.max_torque # alternative to previos liine
-            # torque = 0.4
-            if torque < 0.1 and throttle == 0:
-                torque = 0
-            elif torque > self.max_torque:
-                torque = self.max_torque
-        else:
-            if(phase_increment > 0 and rotation_difference < 0) or (phase_increment < 0 and rotation_difference > 0):
-                new_phase = old_phase
-            new_phase += rotation_difference/2
+        # if abs(rotation_difference) <= self.degrees_per_polpair/4:
+        x = abs(rotation_difference / (self.degrees_per_polpair/4))
+        torque = (1 + (x-1)**3) * self.max_torque
+        # torque = (1 - (1-x**2)**4) * self.max_torque # alternative to previos liine
+        # torque = 0.4
+        if torque < 0.1 and throttle == 0:
+            torque = 0
+        elif torque > self.max_torque:
             torque = self.max_torque
+        # else:
+            # if(phase_increment > 0 and rotation_difference < 0) or (phase_increment < 0 and rotation_difference > 0):
+            #     new_phase = old_phase
+            # new_phase += rotation_difference/2
+            # torque = self.max_torque
             
-        # print('{:2.1f} | {:2.1f} | {:2.2f} | {:2.1f} | {:1.2f}'.format(new_phase/self.polpair, actual_rotation, phase_increment, rotation_difference, torque), end='              \r') # debugging
+        print('Phase target: {:2.1f} \t| Phase actual: {:2.1f} \t| Phase incremeant: {:2.2f} \t| Rotation diff: {:2.1f} \t| Torque: {:1.2f}'.format(new_phase/256 * self.degrees_per_polpair, actual_rotation, phase_increment, rotation_difference, torque), end='              \r') # debugging
         return int(round(new_phase, 0))%256, round(torque, 2)
 
     def get_rotation(self, chip: int) -> float:
@@ -197,6 +197,6 @@ class BLDC():
         self.phase_motor1, torque = self.__calc_phase_torque(throttle, self.phase_motor1, rotation)
 
         self.myPCA9685.set_pwm(self.channel_motor1_input1, torque * math.sin((self.phase_motor1/256)*2*3.14159))
-        self.myPCA9685.set_pwm(self.channel_motor1_input2, torque * math.sin((self.phase_motor1/256)*2*3.14159 +120))
-        self.myPCA9685.set_pwm(self.channel_motor1_input3, torque * math.sin((self.phase_motor1/256)*2*3.14159 +240))
+        self.myPCA9685.set_pwm(self.channel_motor1_input2, torque * math.sin(((self.phase_motor1/256)+(120/360))*2*3.14159))
+        self.myPCA9685.set_pwm(self.channel_motor1_input3, torque * math.sin(((self.phase_motor1/256)+(240/360))*2*3.14159))
 
