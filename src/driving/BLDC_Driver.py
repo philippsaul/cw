@@ -147,8 +147,8 @@ class BLDC():
         self.enable_all_channels()
         self.set_motor_reset(state=False)
         self.set_motor_sleep(state=False)
-        self.check_magnet_strength(0)
-        self.check_magnet_strength(1)
+        # self.check_magnet_strength(0)
+        # self.check_magnet_strength(1)
         self.init_rotation(0)
         self.init_rotation(1)
 
@@ -185,9 +185,9 @@ class BLDC():
         rotation = self.myAS5600.get_rotation_degree(0)
         self.phase_motor0, torque = self.__calc_phase_torque(throttle, self.phase_motor0, rotation)
 
-        self.myPCA9685.set_pwm(self.channel_motor0_input1, torque * self.sin[self.phase_motor0])
-        self.myPCA9685.set_pwm(self.channel_motor0_input2, torque * self.sin[(self.phase_motor0 + 120) % 360])
-        self.myPCA9685.set_pwm(self.channel_motor0_input3, torque * self.sin[(self.phase_motor0 + 240) % 360])
+        # self.myPCA9685.set_pwm(self.channel_motor0_input1, torque * self.sin[self.phase_motor0])
+        # self.myPCA9685.set_pwm(self.channel_motor0_input2, torque * self.sin[(self.phase_motor0 + 120) % 360])
+        # self.myPCA9685.set_pwm(self.channel_motor0_input3, torque * self.sin[(self.phase_motor0 + 240) % 360])
 
         return rotation
 

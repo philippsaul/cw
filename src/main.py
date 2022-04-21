@@ -2,8 +2,7 @@
 import threading
 import time
 
-from calculate_steering_data.calculate_steering_data import \
-    Calculate_steering_data
+from calculate_steering_data.calculate_steering_data import Calculate_steering_data
 from controller.gamepad import Gamepad
 from driving.main_driving import Drivetrain
 from log import log
@@ -12,7 +11,7 @@ from safety.safety import Safety
 from video import web_streaming
 from video.camera import Camera
 
-# myCam = Camera()
+myCam = Camera()
 myGamepad = Gamepad()
 myDrivetrain = Drivetrain()
 myMopets = Motors() # old brushed motors
@@ -22,13 +21,13 @@ myCalcSteering = Calculate_steering_data(gamepad = myGamepad)
 mySafety.enable_gamepad()
 
 #start stram in background
-# stream_thread = threading.Thread(target=web_streaming.start)
-# stream_thread.start()
+stream_thread = threading.Thread(target=web_streaming.start)
+stream_thread.start()
 
 while True:
      try:
-          # frame = myCam.getFrame()
-          # web_streaming.video_frame = frame
+          frame = myCam.getFrame()
+          web_streaming.video_frame = frame
 
           # myGamepad.get_data()
           # myMopets.gamepadcontroll(myGamepad.lt, myGamepad.rt, myGamepad.ls, myGamepad.ab, myGamepad.bb, myGamepad.xb, myGamepad.yb)

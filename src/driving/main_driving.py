@@ -9,6 +9,9 @@ class Drivetrain():
         self.myBLDC = BLDC()
         self.myBLDC.startup()
 
+        self.last_time = 0
+        self.last_rotation_value = 0
+
     def __del__(self) -> None:
         self.myBLDC.set_motor_sleep()
         self.myBLDC.pca9685_output_enable(state=False)
@@ -24,6 +27,17 @@ class Drivetrain():
         motor1_speed = max(min(motor1_speed,1),-1)
 
         motor0_rotation = self.myBLDC.set_motor0_phase(motor0_speed)
-        motor1_rotation = self.myBLDC.set_motor1_phase(motor1_speed)
+        # motor1_rotation = self.myBLDC.set_motor1_phase(motor1_speed)
 
-        
+        diff = motor0_rotation - self.last_rotation_value
+        if diff >= 180:
+            diff -= 360
+        elif diff < -180:
+            diff += 360
+
+        speed = diff/(time.time()-self.last_time)
+        self.last_time = time.time()
+        self.last_rotation_value = motor0_rotation
+
+        print(round(speed,2),end='       \r')
+        time.sleep(0.1)
