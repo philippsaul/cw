@@ -6,6 +6,8 @@ import Jetson.GPIO as GPIO
 
 from calculate_steering_data.calculate_steering_data import \
     Calculate_steering_data
+
+import calculate_steering_data.ball_detection
 from controller.gamepad import Gamepad
 from driving.BLDC_Driver import BLDC
 from driving.main_driving import Drivetrain

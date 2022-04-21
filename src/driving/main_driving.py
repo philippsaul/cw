@@ -42,15 +42,15 @@ class Drivetrain(Thread):
         act_rotation_0_sum, act_rotation_1_sum, difference = self.myBLDC.myAS5600.rotation_difference()
 
 
-        self.rot_fac = self.pid.send([self.myBLDC.myAS5600.buffer_time[-1], difference])
+        self.rot_fac = self.pid.send([time.time(), difference])
 
 
         # if act_rotation_0_sum + act_rotation_1_sum > 0.1:
         #     d_const = 0.5*difference / (0.5*(act_rotation_0_sum + act_rotation_1_sum))
         # else:
         #     d_const = 0
-        motor0_speed = throttle*abs(throttle) - steering*abs(steering) - d_const
-        motor1_speed = throttle*abs(throttle) + steering*abs(steering) + d_const
+        motor0_speed = throttle*abs(throttle) - steering*abs(steering) - self.rot_fac
+        motor1_speed = throttle*abs(throttle) + steering*abs(steering) + self.rot_fac
 
         motor0_speed = max(min(motor0_speed,1),-1)
         motor1_speed = max(min(motor1_speed,1),-1)
