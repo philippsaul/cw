@@ -18,6 +18,7 @@ class Gamepad:
         self.log = log
         self.ls = self.rt = self.lt = self.yb = self.ab = self.bb = self.xb = self.lb = self.trackpad = 0
         self.is_connected = True
+        self.enable_gamepad = False
         self.config = configparser.ConfigParser()
         try:
             self.config.read('./settings.ini')

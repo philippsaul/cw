@@ -8,12 +8,11 @@ class Safety():
         self.log = log
 
     def enable_gamepad(self) -> None:
-        enable_gamepad_variable = False
         pushed = False
         released = False
         self.log.warning('Controller not enabled yet! Push and release both Trigger full.')
 
-        while not enable_gamepad_variable:
+        while not self.gamepad.enable_gamepad:
             self.gamepad.get_data()
             rt = self.gamepad.rt
             lt = self.gamepad.lt
@@ -25,7 +24,7 @@ class Safety():
                 released = True
                 self.log.info('Released!')
             if pushed and released:
-                enable_gamepad_variable = True
+                self.gamepad.enable_gamepad = True
                 self.log.info('Controller enabled!')
             time.sleep(0.1)
 
